@@ -22,7 +22,11 @@ def generate_pdf_report(output_file: str = "report.pdf",
                        max_emails: int = 100,
                        include_details: bool = True,
                        compress: bool = True,
+<<<<<<< HEAD
                        columns: list = [],
+=======
+                       columns: list = None,
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
                        sort_by: str = "date DESC"):
     """
     Generates a PDF report from the email data in the database with optimized memory usage.

@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import os
 
+=======
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
 # Project Capabilities:
 # - Process emails stored in the MBOX_DIRECTORY ("data")
 # - Store processed emails in the database file ("emails.db")
@@ -7,6 +10,7 @@ import os
 # - Log operations to LOG_FILE ("logs/email_processing.log") at the level LOG_LEVEL ("INFO")
 # - Adjust operations for the PACIFIC_TIMEZONE ('America/Los_Angeles')
 
+<<<<<<< HEAD
 # Database configuration
 DATABASE_FILE = os.environ.get('STONE_DB', '/Users/Shared/stonev2.03/emails.db')
 
@@ -28,6 +32,9 @@ ALLOWED_EXPORT_FORMATS = ['txt', 'csv', 'json', 'html']
 # Maximum size of file uploads (5MB)
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
+=======
+DATABASE_FILE = "emails.db"
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
 MBOX_DIRECTORY = "data"
 KEYWORDS = ["urgent", "legal", "contract"]
 LOG_FILE = "logs/email_processing.log"

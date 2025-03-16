@@ -7,7 +7,11 @@ from database import create_database
 from email_processor import process_mbox_files
 from argparse import ArgumentParser
 from utils import (
+<<<<<<< HEAD
     setup_logging, backup_database,
+=======
+    setup_logging, backup_database, check_memory_usage,
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     load_file_cache, save_file_cache, display_statistics
 )
 
@@ -46,7 +50,11 @@ def main() -> int:
         if e.code != 0:
             print("Error: Invalid command line arguments")
             print("Use --help for usage information")
+<<<<<<< HEAD
         return int(e.code) if e.code is not None else 1
+=======
+        return e.code
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     
     if args.version:
         print(f"Stone Email Processor v{config.VERSION}")

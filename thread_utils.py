@@ -3,7 +3,11 @@ Utilities for identifying and managing email threads/conversations.
 """
 import re
 import logging
+<<<<<<< HEAD
 from typing import Dict, List, Optional, Set, Tuple, Any
+=======
+from typing import Dict, List, Optional, Set, Tuple
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
 
 logger = logging.getLogger(__name__)
 
@@ -201,6 +205,7 @@ def are_duplicates(text1: str, text2: str, threshold: float = 0.8) -> bool:
         True if texts are probable duplicates
     """
     return similarity_score(text1, text2) >= threshold
+<<<<<<< HEAD
 
 # Regular expression patterns to identify email thread markers
 THREAD_PATTERNS = [
@@ -289,3 +294,5 @@ def enhance_email_content(email: Dict[str, Any]) -> Dict[str, Any]:
     enhanced['thread_parts'] = split_email_thread(email['content'])
     
     return enhanced
+=======
+>>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
