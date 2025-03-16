@@ -1,9 +1,8 @@
 import sqlite3
 import config
-import argparse
 import os
 import datetime
-from typing import Dict, Any, Optional, Tuple, List, Union
+from typing import Dict, Any, Optional, Tuple, List
 from ocr_utils import process_attachment_ocr
 
 def get_attachment_data(database_file: str, message_id: int, filename: str) -> Optional[Tuple[bytes, str]]:
@@ -275,62 +274,6 @@ def read_database(database_file: str, limit: Optional[int] = None, offset: int =
         print(f"Unexpected error: {e}")
         return None
 
-def display_emails(result: Dict[str, Any]) -> None:
-    """
-    Displays email results in a formatted way.
-    
-    Args:
-        result: Result dictionary from read_database.
-    """
-    if not result or not result.get('emails'):
-        print("No emails found in the database.")
-        return
-    
-    emails = result['emails']
-    print(f"Showing {len(emails)} of {result['total_count']} emails (Page {result['page']}/{result['total_pages']})")
-    print("-" * 80)
-    
-    for email in emails:
-        print(f"ID: {email['message_id']}")
-        print(f"Date: {email['date']}")
-        print(f"From: {email['sender']}")
-        print(f"To: {email['receiver']}")
-        print(f"Subject: {email['subject']}")
-        
-        # Show limited content preview
-        content = email.get('content', '')
-        if content:
-            preview = content[:100] + "..." if len(content) > 100 else content
-            print(f"Content: {preview}")
-        
-        # Display attachments if they exist
-        attachments = email.get('attachments', [])
-        if attachments:
-            print("Attachments:")
-            for attachment in attachments:
-                print(f"  - {attachment['filename']} ({attachment['mime_type']}, {attachment['size']} bytes)")
-                if 'ocr_text' in attachment:
-                    print(f"    OCR Text: {attachment['ocr_text'][:100]}...")
-        
-        print("-" * 80)
-    
-    # Calculate limit from page information to ensure consistency
-    limit = len(emails)
-    
-    # Show pagination info with correct command examples
-    if result['has_prev']:
-        print(f"Use --offset 0 for first page")
-        prev_offset = (result['page'] - 2) * limit
-        if prev_offset > 0:
-            print(f"Use --offset {prev_offset} for previous page")
-        else:
-            print(f"Use --offset 0 for previous page")
-        
-    if result['has_next']:
-        next_offset = result['page'] * limit
-        print(f"Use --offset {next_offset} for next page")
-        print(f"Example: python read_db.py --limit {limit} --offset {next_offset}")
-
 def import_pdf_file(database_file: str, pdf_path: str, metadata: Optional[Dict[str, Any]] = None) -> Optional[int]:
     """
     Import a PDF file into the database as a standalone document.
@@ -550,8 +493,13 @@ def get_pdf_documents(database_file: str, limit: Optional[int] = None, offset: i
             
             # Add WHERE clause if a query is specified
             if query:
-                base_query += " WHERE d.title LIKE ? OR d.filename LIKE ? OR d.notes LIKE ? OR d.tags LIKE ?"
+                # Fixed: Add proper parentheses around conditions
+                base_query += " WHERE (d.title LIKE ? OR d.filename LIKE ? OR d.notes LIKE ? OR d.tags LIKE ?"
                 params = [f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%"]
+                
+                # Also search in OCR text if available
+                base_query += " OR pd.ocr_text LIKE ?)"
+                params.append(f"%{query}%")
             
             # Add ORDER BY clause
             base_query += f" ORDER BY d.{safe_order_by}"
@@ -559,20 +507,23 @@ def get_pdf_documents(database_file: str, limit: Optional[int] = None, offset: i
             # Add LIMIT and OFFSET for pagination
             if limit is not None and limit > 0:
                 base_query += " LIMIT ?"
-                params.append(limit)
+                # Fixed: Convert limit to string to avoid type issues
+                params.append(str(limit))
                 
             if offset > 0:
                 base_query += " OFFSET ?"
-                params.append(offset)
+                # Fixed: Convert offset to string to avoid type issues
+                params.append(str(offset))
             
             cursor.execute(base_query, params)
             documents = [dict(row) for row in cursor.fetchall()]
             
             # Get total count for pagination info
-            count_query = "SELECT COUNT(*) FROM pdf_documents"
+            # Fixed: Update count query to match the main query including OCR text
+            count_query = "SELECT COUNT(*) FROM pdf_documents d LEFT JOIN pdf_document_data pd ON d.document_id = pd.document_id"
             if query:
-                count_query += " WHERE title LIKE ? OR filename LIKE ? OR notes LIKE ? OR tags LIKE ?"
-                cursor.execute(count_query, [f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%"])
+                count_query += " WHERE (d.title LIKE ? OR d.filename LIKE ? OR d.notes LIKE ? OR d.tags LIKE ? OR pd.ocr_text LIKE ?)"
+                cursor.execute(count_query, [f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%"])
             else:
                 cursor.execute(count_query)
                 
@@ -602,129 +553,28 @@ def get_pdf_documents(database_file: str, limit: Optional[int] = None, offset: i
         print(f"Unexpected error retrieving PDF documents: {e}")
         return None
 
-def display_pdf_documents(result: Dict[str, Any]) -> None:
-    """
-    Displays PDF document results in a formatted way.
-    
-    Args:
-        result: Result dictionary from get_pdf_documents.
-    """
-    if not result or not result.get('documents'):
-        print("No PDF documents found in the database.")
-        return
-    
-    documents = result['documents']
-    print(f"Showing {len(documents)} of {result['total_count']} PDF documents (Page {result['page']}/{result['total_pages']})")
-    print("-" * 80)
-    
-    for doc in documents:
-        print(f"ID: {doc['document_id']}")
-        print(f"Title: {doc['title']}")
-        print(f"Filename: {doc['filename']}")
-        print(f"Date: {doc['date']}")
-        print(f"Source: {doc['source']}")
-        if doc.get('tags'):
-            print(f"Tags: {doc['tags']}")
-        print(f"Size: {doc.get('file_size', 0)} bytes")
-        print(f"OCR Processed: {'Yes' if doc.get('has_ocr') else 'No'}")
-        
-        if doc.get('notes'):
-            notes = doc['notes']
-            preview = notes[:100] + "..." if len(notes) > 100 else notes
-            print(f"Notes: {preview}")
-        
-        print("-" * 80)
-    
-    # Show pagination info
-    if result['has_prev']:
-        print(f"Use --offset 0 for first page")
-        prev_offset = (result['page'] - 2) * len(documents)
-        if prev_offset > 0:
-            print(f"Use --offset {prev_offset} for previous page")
-        else:
-            print(f"Use --offset 0 for previous page")
-        
-    if result['has_next']:
-        next_offset = result['page'] * len(documents)
-        print(f"Use --offset {next_offset} for next page")
-        print(f"Example: python read_db.py --pdf-list --limit {len(documents)} --offset {next_offset}")
-
+# Simplified main function
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Query and display emails and PDF documents from the database.")
-    parser.add_argument("--db", help=f"Path to database file (default: {config.DATABASE_FILE})",
-                      default=config.DATABASE_FILE)
-    parser.add_argument("--limit", type=int, help="Maximum number of results to return", default=10)
-    parser.add_argument("--offset", type=int, help="Number of results to skip (for pagination)", default=0)
-    parser.add_argument("--query", help="Search query to filter emails or PDFs", default=None)
-    parser.add_argument("--order", help="Field to order results by (default: date DESC)", 
-                      default="date DESC")
-    parser.add_argument("--count-only", action="store_true", help="Only show count of matching emails")
-    parser.add_argument("--ocr", action="store_true", help="Include OCR results for attachments")
-    parser.add_argument("--process-ocr", metavar="ATTACHMENT_ID", type=int, 
-                       help="Process specific attachment through OCR")
+    import argparse
     
-    # Add PDF-specific arguments
+    parser = argparse.ArgumentParser(description="Database access API - primarily for web interface.")
     parser.add_argument("--import-pdf", metavar="PDF_PATH", help="Import a PDF file into the database")
-    parser.add_argument("--pdf-title", help="Title for the imported PDF")
-    parser.add_argument("--pdf-date", help="Date for the imported PDF (YYYY-MM-DD format)")
-    parser.add_argument("--pdf-source", help="Source of the imported PDF")
-    parser.add_argument("--pdf-tags", help="Tags for the imported PDF (comma-separated)")
-    parser.add_argument("--pdf-notes", help="Notes for the imported PDF")
-    parser.add_argument("--pdf-list", action="store_true", help="List PDF documents in the database")
-    parser.add_argument("--process-pdf-ocr", metavar="DOCUMENT_ID", type=int, 
-                       help="Process specific PDF document through OCR")
+    parser.add_argument("--process-ocr", metavar="ATTACHMENT_ID", type=int, help="Process attachment OCR")
+    parser.add_argument("--process-pdf-ocr", metavar="DOCUMENT_ID", type=int, help="Process PDF OCR")
     
     args = parser.parse_args()
     
     if args.import_pdf:
-        metadata = {}
-        if args.pdf_title:
-            metadata['title'] = args.pdf_title
-        if args.pdf_date:
-            metadata['date'] = args.pdf_date
-        if args.pdf_source:
-            metadata['source'] = args.pdf_source
-        if args.pdf_tags:
-            metadata['tags'] = args.pdf_tags
-        if args.pdf_notes:
-            metadata['notes'] = args.pdf_notes
+        document_id = import_pdf_file(config.DATABASE_FILE, args.import_pdf)
+        if document_id:
+            print(f"Successfully imported PDF: ID={document_id}")
             
-        document_id = import_pdf_file(args.db, args.import_pdf, metadata)
-        if document_id and args.process_pdf_ocr is None:
-            # Ask if user wants to process OCR
-            response = input("Do you want to process this PDF with OCR? (y/n): ")
-            if response.lower() == 'y':
-                print("Processing OCR, this may take a while...")
-                ocr_text = process_pdf_for_ocr(args.db, document_id)
-                if ocr_text:
-                    print(f"OCR processing successful. Extracted {len(ocr_text)} characters.")
-                else:
-                    print("OCR processing failed or unsupported document type.")
-    
-    elif args.process_pdf_ocr:
-        print("Processing PDF with OCR, this may take a while...")
-        ocr_text = process_pdf_for_ocr(args.db, args.process_pdf_ocr)
-        if ocr_text:
-            print(f"OCR processing successful. Extracted {len(ocr_text)} characters.")
-        else:
-            print("OCR processing failed or unsupported document type.")
-    
-    elif args.pdf_list:
-        result = get_pdf_documents(args.db, args.limit, args.offset, args.query, args.order)
-        if result:
-            display_pdf_documents(result)
-    
     elif args.process_ocr:
-        result = process_attachment_for_ocr(args.db, args.process_ocr)
+        result = process_attachment_for_ocr(config.DATABASE_FILE, args.process_ocr)
         if result:
-            print(f"OCR processing successful. Extracted {len(result)} characters.")
-        else:
-            print("OCR processing failed or unsupported attachment type.")
-    elif args.count_only:
-        result = read_database(args.db, 0, 0, args.query)
+            print(f"OCR processing successful: {len(result)} characters extracted")
+            
+    elif args.process_pdf_ocr:
+        result = process_pdf_for_ocr(config.DATABASE_FILE, args.process_pdf_ocr)
         if result:
-            print(f"Total emails: {result['total_count']}")
-    else:
-        result = read_database(args.db, args.limit, args.offset, args.query, args.order, include_ocr=args.ocr)
-        if result:
-            display_emails(result)
+            print(f"PDF OCR processing successful: {len(result)} characters extracted")

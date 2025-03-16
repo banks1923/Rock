@@ -4,13 +4,14 @@ from datetime import datetime
 import logging
 import os
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.enums import TA_LEFT, TA_JUSTIFY
+from reportlab.lib.enums import TA_JUSTIFY
 from text_utils import TextCleaner
 from pathlib import Path
+from typing import Optional, List
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -22,11 +23,7 @@ def generate_pdf_report(output_file: str = "report.pdf",
                        max_emails: int = 100,
                        include_details: bool = True,
                        compress: bool = True,
-<<<<<<< HEAD
-                       columns: list = [],
-=======
-                       columns: list = None,
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
+                       columns: Optional[List[str]] = None,
                        sort_by: str = "date DESC"):
     """
     Generates a PDF report from the email data in the database with optimized memory usage.
@@ -50,6 +47,8 @@ def generate_pdf_report(output_file: str = "report.pdf",
     
     # Set default columns if not specified
     if columns is None:
+        columns = ["message_id", "date", "sender", "subject"]
+    elif len(columns) == 0:
         columns = ["message_id", "date", "sender", "subject"]
     
     try:
@@ -495,7 +494,7 @@ def generate_thread_report(output_file: str = "thread_report.pdf",
             thread_emails = cursor.fetchall()
             
             # Process each email in the thread
-            for j, (message_id, date_str, sender, email_subject, content) in enumerate(thread_emails):
+            for j, (_, date_str, sender, email_subject, content) in enumerate(thread_emails):
                 elements.append(Paragraph(f"Message #{j+1}", styles["Heading2"]))
                 elements.append(Paragraph(f"From: {sender}", styles["Normal"]))
                 elements.append(Paragraph(f"Date: {date_str}", styles["Normal"]))

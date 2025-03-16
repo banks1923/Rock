@@ -1,26 +1,18 @@
 import os
-<<<<<<< HEAD
 import html
 import json
 import mimetypes
 from flask import Flask, render_template, request, url_for, redirect, make_response, send_file, jsonify
-from read_db import read_database, get_attachment_data, process_attachment_for_ocr
+from read_db import read_database, get_attachment_data, process_attachment_for_ocr, get_pdf_documents, process_pdf_for_ocr
 import config
 import datetime
 from thread_utils import enhance_email_content
-=======
-from flask import Flask, render_template, request, url_for, redirect, make_response
-from read_db import read_database
-import config
-import datetime
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
 
 app = Flask(__name__)
 
 # Ensure template directory exists
 os.makedirs(os.path.join(os.path.dirname(__file__), 'templates'), exist_ok=True)
 
-<<<<<<< HEAD
 # Define template filter for decoding HTML entities
 @app.template_filter('decode_html')
 def decode_html(text):
@@ -29,8 +21,6 @@ def decode_html(text):
         return ""
     return html.unescape(text)
 
-=======
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
 @app.route('/')
 def index():
     # Get query parameters
@@ -39,10 +29,7 @@ def index():
     limit = int(request.args.get('limit', 20))
     order_by = request.args.get('order_by', 'date DESC')
     count_only = request.args.get('count_only') == 'true'
-<<<<<<< HEAD
     include_ocr = request.args.get('include_ocr') == 'true'
-=======
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     
     # Available page size options
     page_sizes = [10, 20, 50, 100]
@@ -50,7 +37,6 @@ def index():
     # Calculate offset based on page
     offset = (page - 1) * limit
     
-<<<<<<< HEAD
     # Query database with OCR option
     result = read_database(config.DATABASE_FILE, limit, offset, query, order_by, include_ocr=include_ocr)
     
@@ -59,13 +45,6 @@ def index():
     else:
         # Process each email to identify thread parts
         result['emails'] = [enhance_email_content(email) for email in result['emails']]
-=======
-    # Query database
-    result = read_database(config.DATABASE_FILE, limit, offset, query, order_by)
-    
-    if not result:
-        result = {'emails': [], 'total_count': 0, 'page': 1, 'total_pages': 1, 'has_next': False, 'has_prev': False}
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     
     # Available sort options
     sort_options = [
@@ -94,6 +73,7 @@ def index():
                           order_by=order_by,
                           sort_options=sort_options,
                           count_only=count_only,
+                          include_ocr=include_ocr,
                           pagination_range=pagination_range)
 
 @app.route('/settings', methods=['POST'])
@@ -103,6 +83,7 @@ def settings():
     limit = request.form.get('limit', '20')
     order_by = request.form.get('order_by', 'date DESC')
     count_only = 'count_only' in request.form
+    include_ocr = 'include_ocr' in request.form
     
     # Redirect to index with new settings
     return redirect(url_for('index', 
@@ -110,6 +91,7 @@ def settings():
                            limit=limit,
                            order_by=order_by,
                            count_only='true' if count_only else 'false',
+                           include_ocr='true' if include_ocr else 'false',
                            page=1))  # Reset to first page with new settings
 
 @app.route('/report')
@@ -117,7 +99,6 @@ def generate_report():
     # Get query parameters
     query = request.args.get('query', '')
     order_by = request.args.get('order_by', 'date DESC')
-<<<<<<< HEAD
     include_ocr = request.args.get('include_ocr') == 'true'
     
     # For reports, we want all matching emails (no pagination)
@@ -128,14 +109,6 @@ def generate_report():
     else:
         # Process each email to identify thread parts
         result['emails'] = [enhance_email_content(email) for email in result['emails']]
-=======
-    
-    # For reports, we want all matching emails (no pagination)
-    result = read_database(config.DATABASE_FILE, None, 0, query, order_by)
-    
-    if not result:
-        result = {'emails': [], 'total_count': 0, 'page': 1, 'total_pages': 1}
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     
     # Generate report timestamp
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -159,12 +132,9 @@ def download_report():
     
     if not result:
         result = {'emails': [], 'total_count': 0, 'page': 1, 'total_pages': 1}
-<<<<<<< HEAD
     else:
         # Process each email to identify thread parts for better formatting
         result['emails'] = [enhance_email_content(email) for email in result['emails']]
-=======
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     
     if format_type == 'csv':
         # Generate CSV file
@@ -179,7 +149,6 @@ def download_report():
         
         # Write data rows
         for email in result['emails']:
-<<<<<<< HEAD
             # Decode HTML entities before writing to CSV
             writer.writerow([
                 email.get('date', ''),
@@ -187,21 +156,12 @@ def download_report():
                 html.unescape(email.get('receiver', '')),
                 html.unescape(email.get('subject', '')),
                 html.unescape(email.get('content', ''))
-=======
-            writer.writerow([
-                email.get('date', ''),
-                email.get('sender', ''),
-                email.get('receiver', ''),
-                email.get('subject', ''),
-                email.get('content', '')
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
             ])
         
         response = make_response(output.getvalue())
         response.headers["Content-Disposition"] = f"attachment; filename=email_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
         response.headers["Content-type"] = "text/csv"
         return response
-<<<<<<< HEAD
     elif format_type == 'json':
         # Generate JSON file
         # Clean data for JSON serialization
@@ -249,9 +209,6 @@ def download_report():
         response.headers["Content-Disposition"] = f"attachment; filename=email_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
         response.headers["Content-type"] = "text/html"
         return response
-=======
-    
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
     else:  # Default to text format
         # Generate plain text report
         lines = [
@@ -262,7 +219,6 @@ def download_report():
         ]
         
         for email in result['emails']:
-<<<<<<< HEAD
             # Decode HTML entities in text report
             lines.extend([
                 f"Date: {email.get('date', '')}",
@@ -282,24 +238,12 @@ def download_report():
                 lines.append(html.unescape(email.get('content', '')))
                 
             lines.append("-" * 80)
-=======
-            lines.extend([
-                f"Date: {email.get('date', '')}",
-                f"From: {email.get('sender', '')}",
-                f"To: {email.get('receiver', '')}",
-                f"Subject: {email.get('subject', '')}",
-                f"Content:",
-                email.get('content', ''),
-                "-" * 80
-            ])
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
-        
+    
         response = make_response("\n".join(lines))
         response.headers["Content-Disposition"] = f"attachment; filename=email_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         response.headers["Content-type"] = "text/plain"
         return response
 
-<<<<<<< HEAD
 @app.route('/attachment/<int:message_id>/<path:filename>')
 def download_attachment(message_id, filename):
     """
@@ -376,7 +320,44 @@ def ocr_attachment(attachment_id):
             'error': str(e)
         }), 500
 
-=======
->>>>>>> 5dd220e29bd9c42de6ab7acbe763b94e6d7878de
+@app.route('/pdfs')
+def pdf_list():
+    # Get query parameters
+    query = request.args.get('query', '')
+    page = max(1, int(request.args.get('page', 1)))
+    limit = int(request.args.get('limit', 20))
+    order_by = request.args.get('order_by', 'date DESC')
+    
+    # Calculate offset based on page
+    offset = (page - 1) * limit
+    
+    # Query database
+    result = get_pdf_documents(config.DATABASE_FILE, limit, offset, query, order_by)
+    
+    # Render PDF list template
+    return render_template('pdf_list.html', 
+                          result=result,
+                          query=query, 
+                          page=page,
+                          limit=limit,
+                          order_by=order_by)
+
+@app.route('/api/search')
+def api_search():
+    """API endpoint for searching emails - useful for AJAX requests"""
+    query = request.args.get('query', '')
+    limit = int(request.args.get('limit', 10))
+    offset = int(request.args.get('offset', 0))
+    order_by = request.args.get('order_by', 'date DESC')
+    include_ocr = request.args.get('include_ocr') == 'true'
+    
+    result = read_database(config.DATABASE_FILE, limit, offset, query, order_by, include_ocr)
+    if result:
+        # Process emails to enhance with thread parts
+        result['emails'] = [enhance_email_content(email) for email in result['emails']]
+        return jsonify(result)
+    else:
+        return jsonify({'error': 'Search failed'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
