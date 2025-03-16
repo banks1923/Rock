@@ -28,9 +28,31 @@ ALLOWED_EXPORT_FORMATS = ['txt', 'csv', 'json', 'html']
 # Maximum size of file uploads (5MB)
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
-MBOX_DIRECTORY = "data"
+# Input directory settings - this is where you place files for processing
+MBOX_DIRECTORY = "data"  # Default directory for all input files (emails, images, PDFs)
+SUPPORTED_EXTENSIONS = {
+    'emails': ['.mbox', '.eml'],
+    'images': ['.jpg', '.jpeg', '.png'],
+    'documents': ['.pdf']  # Added PDF support
+}
+
 KEYWORDS = ["urgent", "legal", "contract"]
 LOG_FILE = "logs/email_processing.log"
 LOG_LEVEL = "INFO"
 PACIFIC_TIMEZONE = 'America/Los_Angeles'
 VERSION = "2.0.3"  # Added version number
+
+# Image processing settings
+IMAGE_PROCESSING_ENABLED = True
+SUPPORTED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png']
+IMAGE_STORAGE_DIR = "processed_images"  # Subdirectory to store processed images
+
+# Document processing settings
+DOCUMENT_PROCESSING_ENABLED = True  # Enable processing of PDF documents
+PDF_STORAGE_DIR = "processed_documents"  # Subdirectory to store processed documents
+
+# UI settings
+AUTO_OPEN_UI = True  # Whether to automatically open the UI when processing completes
+UI_PORT = 8080  # Port for the web UI
+UI_HOST = "127.0.0.1"  # Host for the web UI (localhost)
+BROWSER_PATH = None  # Set to specific path if auto-detection fails

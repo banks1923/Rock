@@ -330,3 +330,60 @@ TypeError: 'mbox' object does not support the context manager protocol
 2025-03-15 19:13:20 - INFO - utils - display_statistics - - Emails processed: 0
 2025-03-15 19:13:20 - INFO - utils - display_statistics - - Total execution time: 8.70 seconds
 2025-03-15 19:13:20 - INFO - utils - display_statistics - ==================================================
+2025-03-16 13:52:35 - INFO - email_processor - process_mbox_files - Found 1 .mbox files to process
+2025-03-16 13:52:35 - INFO - email_processor - process_mbox_files - Processing file: data/Stone Legal Archive.mbox
+2025-03-16 13:52:37 - INFO - email_processor - process_mbox_batches - Processing mbox file in batches: data/Stone Legal Archive.mbox
+2025-03-16 13:52:40 - INFO - email_processor - process_mbox_batches - Found 203 messages in data/Stone Legal Archive.mbox
+2025-03-16 13:52:44 - INFO - email_processor - process_mbox_batches - Processed 203/203 emails (100.0%)
+2025-03-16 13:52:44 - INFO - email_processor - process_mbox_files - Inserted 0 emails from batch
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--1657123415347359841: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--8024192971776257413: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-3721905590510899945: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-5916462745533903355: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--6448881170165724374: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--439351029233486453: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-8183930456306950073: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-661936281500281165: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--5722289654947351781: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-7309655056382916126: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--8566748276219527818: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-6773297643302665865: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--691807978208137990: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-4005179708866009837: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--5695781672108356884: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-3341687202905412399: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--6254722138644720053: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-4801325603237676490: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--7403531504940688046: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--2276108764225073545: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-2475992436252014015: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--630672064567669522: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--1886567575708206081: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-8646145632942609287: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-140439429574271053: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-7157324838358373126: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-7181699264583793468: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-4710345607412966436: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-8490770111589846299: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--7873670845375633052: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-7749681638321655125: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--3765782823865017567: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--5086493050909973443: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-4362617198384517916: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--6930806647494797743: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-547781845485829739: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-7152514472158224170: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--4054454986803434541: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-2713285826567245424: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--362517418809767031: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--1633078500248760849: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread-7230418305638954439: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - ERROR - email_processor - process_mbox_files - Error processing thread thread--118837824152999623: name 'update_thread_info' is not defined
+2025-03-16 13:52:44 - INFO - email_processor - process_mbox_batches - Closed mbox file: data/Stone Legal Archive.mbox
+2025-03-16 13:52:44 - INFO - email_processor - process_mbox_files - Completed processing data/Stone Legal Archive.mbox: 0 of 203 emails processed
+2025-03-16 13:52:44 - INFO - utils - display_statistics - ==================================================
+2025-03-16 13:52:44 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-16 13:52:44 - INFO - utils - display_statistics - - Files processed: 1
+2025-03-16 13:52:44 - INFO - utils - display_statistics - - Emails processed: 0
+2025-03-16 13:52:44 - INFO - utils - display_statistics - - Total execution time: 8.60 seconds
+2025-03-16 13:52:44 - INFO - utils - display_statistics - ==================================================

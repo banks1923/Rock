@@ -123,18 +123,19 @@ def save_file_cache(cache_data):
         return False
 
 def display_statistics(logger, metrics):
-    """
-    Display processing statistics.
-    """
-    execution_time = time.time() - metrics["start_time"]
+    """Display processing statistics."""
+    elapsed_time = time.time() - metrics["start_time"]
     logger.info("=" * 50)
     logger.info("Processing Statistics:")
-    logger.info(f"- Files processed: {metrics['processed_files']}")
-    logger.info(f"- Emails processed: {metrics['processed_emails']}")
+    logger.info(f"Total processing time: {elapsed_time:.2f} seconds")
     
-    if metrics["processed_emails"] > 0 and execution_time > 0:
-        emails_per_second = metrics["processed_emails"] / execution_time
-        logger.info(f"- Processing speed: {emails_per_second:.2f} emails/second")
+    if "processed_emails" in metrics:
+        logger.info(f"Processed emails: {metrics.get('processed_emails', 0)}")
     
-    logger.info(f"- Total execution time: {execution_time:.2f} seconds")
+    if "processed_files" in metrics:
+        logger.info(f"Processed email files: {metrics.get('processed_files', 0)}")
+    
+    if "processed_images" in metrics:
+        logger.info(f"Processed images: {metrics.get('processed_images', 0)}")
+    
     logger.info("=" * 50)
