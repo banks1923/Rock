@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report_title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: white;
+        }
+        .report-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .report-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .report-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .email-item {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .email-field {
+            margin-bottom: 8px;
+        }
+        .field-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 80px;
+            vertical-align: top;
+        }
+        .field-value {
+            display: inline-block;
+            max-width: calc(100% - 90px);
+        }
+        .content-field {
+            margin-top: 12px;
+            white-space: pre-wrap;
+        }
+        .report-footer {
+            margin-top: 40px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 0.8em;
+            text-align: center;
+            color: #666;
+        }
+        .thread-separator {
+            border-top: 1px dashed #ccc; 
+            margin: 15px 0;
+        }
+        .attachment-list {
+            margin-top: 5px;
+            padding-left: 15px;
+        }
+        .attachment-link {
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="report-header">
+            <h1>{{ report_title }}</h1>
+            <div class="report-meta">
+                <p>Generated on: {{ timestamp }}</p>
+                <p>Total emails found: {{ result.total_count }}</p>
+                {% if query %}<p>Search query: "{{ query }}"</p>{% endif %}
+                <p>Sort order: {{ order_by }}</p>
+            </div>
+        </div>
+        
+        {% if result.emails %}
+            {% for email in result.emails %}
+                <div class="email-item">
+                    <div class="email-field">
+                        <span class="field-label">Date:</span>
+                        <span class="field-value">{{ email.date }}</span>
+                    </div>
+                    <div class="email-field">
+                        <span class="field-label">From:</span>
+                        <span class="field-value">{{ email.sender|decode_html }}</span>
+                    </div>
+                    <div class="email-field">
+                        <span class="field-label">To:</span>
+                        <span class="field-value">{{ email.receiver|decode_html }}</span>
+                    </div>
+                    <div class="email-field">
+                        <span class="field-label">Subject:</span>
+                        <span class="field-value">{{ email.subject|decode_html }}</span>
+                    </div>
+                    
+                    {% if email.attachments %}
+                    <div class="email-field">
+                        <span class="field-label">Attachments:</span>
+                        <span class="field-value">
+                            <ul class="attachment-list">
+                                {% for attachment in email.attachments %}
+                                <li>
+                                    {{ attachment.filename }} ({{ (attachment.size / 1024)|int }}KB)
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="content-field">
+                        {% if email.thread_parts %}
+                            {% for part in email.thread_parts %}
+                                {% if not loop.first %}
+                                    <div class="thread-separator"></div>
+                                {% endif %}
+                                <div class="thread-part">
+                                    {{ part|decode_html }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ email.content|decode_html }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No emails match your search criteria.</p>
+        {% endif %}
+        
+        <div class="report-footer">
+            <p>Email Database Report - Generated by Stone Email Database Viewer</p>
+        </div>
+    </div>
+</body>
+</html>
