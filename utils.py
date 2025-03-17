@@ -8,6 +8,7 @@ import shutil
 import psutil
 import config
 from pathlib import Path
+from typing import List, Dict, Any
 
 def setup_logging() -> logging.Logger:
     """
@@ -137,5 +138,94 @@ def display_statistics(logger, metrics):
     
     if "processed_images" in metrics:
         logger.info(f"Processed images: {metrics.get('processed_images', 0)}")
+        
+    if "processed_pdfs" in metrics:
+        logger.info(f"Processed PDF files: {metrics.get('processed_pdfs', 0)}")
+    
+    if "unsupported_files" in metrics and metrics["unsupported_files"]:
+        logger.info(f"Unsupported files: {len(metrics['unsupported_files'])}")
+        
+        # Group unsupported files by extension
+        ext_counts = {}
+        for file_info in metrics["unsupported_files"]:
+            ext = file_info["extension"] or "no extension"
+            if ext not in ext_counts:
+                ext_counts[ext] = 0
+            ext_counts[ext] += 1
+        
+        # Display extension counts
+        logger.info("Unsupported file types:")
+        for ext, count in sorted(ext_counts.items(), key=lambda x: x[1], reverse=True):
+            logger.info(f"  {ext}: {count} file(s)")
     
     logger.info("=" * 50)
+
+def ensure_data_directory(directory_path: Path) -> None:
+    """
+    Ensures the data directory exists and contains example README.txt file.
+    
+    Args:
+        directory_path: Path to the data directory
+    """
+    # Create the directory if it doesn't exist
+    directory_path.mkdir(parents=True, exist_ok=True)
+    
+    # Create a README.txt file with instructions if it doesn't exist
+    readme_path = directory_path / "README.txt"
+    if not readme_path.exists():
+        with open(readme_path, 'w') as f:
+            f.write("""DATA DIRECTORY
+============
+
+This directory is for files to be processed by the Stone Email & Image Processor.
+
+Supported file types:
+- Emails: .mbox, .eml files
+- Images: .jpg, .jpeg, .png files
+- Documents: .pdf files
+
+Simply place your files in this directory and run the processor.
+Results will be displayed in the web UI that opens automatically.
+
+For more options, run with --help flag:
+    python main.py --help
+""")
+
+def identify_unsupported_files(directory_path: str, logger: logging.Logger) -> List[Dict[str, str]]:
+    """
+    Identify files in the directory that aren't supported by any processor.
+    
+    Args:
+        directory_path: Path to the directory containing files
+        logger: Logger instance
+    
+    Returns:
+        List of dictionaries with information about unsupported files
+    """
+    # Gather all supported extensions from config
+    all_supported_exts = []
+    for category, exts in config.SUPPORTED_EXTENSIONS.items():
+        all_supported_exts.extend(exts)
+    
+    # Make sure all extensions are lowercase for case-insensitive comparison
+    all_supported_exts = [ext.lower() for ext in all_supported_exts]
+    
+    unsupported_files = []
+    directory = Path(directory_path)
+    
+    # Get all files in directory (excluding directories)
+    try:
+        for file_path in directory.iterdir():
+            if file_path.is_file() and file_path.name != "README.txt":
+                ext = file_path.suffix.lower()
+                if ext not in all_supported_exts:
+                    unsupported_files.append({
+                        "name": file_path.name,
+                        "path": str(file_path),
+                        "extension": ext,
+                        "size": file_path.stat().st_size
+                    })
+    except Exception as e:
+        logger.error(f"Error scanning directory for unsupported files: {e}")
+    
+    return unsupported_files

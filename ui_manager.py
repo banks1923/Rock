@@ -65,8 +65,15 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
 def create_basic_ui_files():
     """Create basic UI files if they don't exist."""
+    # Check for both "ui_static" and "UI Static" directories
     ui_dir = Path(__file__).parent / 'ui_static'
-    ui_dir.mkdir(exist_ok=True)
+    alt_ui_dir = Path(__file__).parent / 'UI Static'
+    
+    # Use whichever one exists, or create ui_static if neither exists
+    if alt_ui_dir.exists():
+        ui_dir = alt_ui_dir
+    else:
+        ui_dir.mkdir(exist_ok=True)
     
     # Create index.html if it doesn't exist
     index_path = ui_dir / 'index.html'
@@ -110,6 +117,10 @@ def create_basic_ui_files():
             margin-bottom: 15px;
             border-left: 5px solid #333;
         }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -125,6 +136,12 @@ def create_basic_ui_files():
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+        .instructions {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 10px;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
@@ -132,10 +149,29 @@ def create_basic_ui_files():
         <header>
             <h1>Stone Email & Image Processor</h1>
         </header>
+        
+        <div class="instructions">
+            <h3>How to Use This Tool</h3>
+            <p>To process files, place them in the input directory (default: <code>data</code> folder) and run the application.</p>
+            <p>Supported file types:</p>
+            <ul>
+                <li><strong>Emails:</strong> .mbox, .eml files</li>
+                <li><strong>Images:</strong> .jpg, .jpeg, .png files</li>
+                <li><strong>Documents:</strong> .pdf files</li>
+            </ul>
+            <p>You can specify a different input directory with the <code>--directory</code> or <code>-d</code> command-line option.</p>
+        </div>
+        
         <div class="card">
             <h2>Processing Summary</h2>
             <div id="processing-summary">Loading...</div>
         </div>
+        
+        <div id="unsupported-files-section" style="display: none;" class="card warning">
+            <h2>Unsupported Files</h2>
+            <div id="unsupported-files">Loading...</div>
+        </div>
+        
         <div class="card">
             <h2>Recent Processing Details</h2>
             <div id="processing-details">Loading...</div>
@@ -182,8 +218,54 @@ def create_basic_ui_files():
                 summaryHtml += `<tr><td><strong>Image Files Found</strong></td><td>${metrics.image_files_found}</td></tr>`;
             }
             
+            if ('processed_pdfs' in metrics) {
+                summaryHtml += `<tr><td><strong>Processed PDFs</strong></td><td>${metrics.processed_pdfs}</td></tr>`;
+            }
+            
+            if ('pdf_files_found' in metrics) {
+                summaryHtml += `<tr><td><strong>PDF Files Found</strong></td><td>${metrics.pdf_files_found}</td></tr>`;
+            }
+            
             summaryHtml += '</table>';
             document.getElementById('processing-summary').innerHTML = summaryHtml;
+            
+            // Display unsupported files if present
+            if (metrics.unsupported_files && metrics.unsupported_files.length > 0) {
+                document.getElementById('unsupported-files-section').style.display = 'block';
+                
+                // Group by extension
+                const byExtension = {};
+                metrics.unsupported_files.forEach(file => {
+                    const ext = file.extension || 'no extension';
+                    if (!byExtension[ext]) {
+                        byExtension[ext] = [];
+                    }
+                    byExtension[ext].push(file);
+                });
+                
+                let unsupportedHtml = `<p>Found ${metrics.unsupported_files.length} files with unsupported file types:</p>`;
+                unsupportedHtml += '<table>';
+                unsupportedHtml += '<tr><th>Extension</th><th>Count</th><th>Examples</th></tr>';
+                
+                for (const ext in byExtension) {
+                    const files = byExtension[ext];
+                    const examples = files.slice(0, 3).map(f => f.name).join(', ');
+                    const moreCount = files.length > 3 ? ` and ${files.length - 3} more` : '';
+                    
+                    unsupportedHtml += `<tr>
+                        <td>${ext}</td>
+                        <td>${files.length}</td>
+                        <td>${examples}${moreCount}</td>
+                    </tr>`;
+                }
+                
+                unsupportedHtml += '</table>';
+                unsupportedHtml += '<p>To process these files, support for these file types needs to be added to the application.</p>';
+                
+                document.getElementById('unsupported-files').innerHTML = unsupportedHtml;
+            } else {
+                document.getElementById('unsupported-files-section').style.display = 'none';
+            }
             
             // Display additional details if available
             let detailsHtml = '<p>No detailed information available.</p>';
@@ -216,6 +298,13 @@ def start_ui_server(metrics, logger):
     Returns:
         tuple: (server, server_thread)
     """
+    # Check for both "ui_static" and "UI Static" directories
+    ui_dir = Path(__file__).parent / 'ui_static'
+    alt_ui_dir = Path(__file__).parent / 'UI Static'
+    
+    if alt_ui_dir.exists():
+        ui_dir = alt_ui_dir
+    
     # Create UI files if they don't exist
     create_basic_ui_files()
     

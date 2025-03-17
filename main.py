@@ -6,26 +6,30 @@ import config
 from database import create_database
 from email_processor import process_mbox_files
 from image_processor import process_image_files
+from pdf_processor import process_pdf_files
 from ui_manager import start_ui_server, open_ui_in_browser
 from argparse import ArgumentParser
 from utils import (
     setup_logging, backup_database,
-    load_file_cache, save_file_cache, display_statistics
+    load_file_cache, save_file_cache, display_statistics,
+    ensure_data_directory, identify_unsupported_files
 )
 
 def parse_args():
     """
     Parse command line arguments for the application.
     """
-    parser = ArgumentParser(description="Process .mbox files and image files and insert data into the database.")
-    parser.add_argument("--directory", "-d", help=f"Directory containing .mbox and image files (default: {config.MBOX_DIRECTORY})", 
-                        type=str, default=config.MBOX_DIRECTORY)
+    parser = ArgumentParser(description="Process email, image, and PDF files and insert data into the database.")
+    parser.add_argument("--directory", "-d", 
+                       help=f"Directory containing files to process (emails, images, PDFs). Default: {config.MBOX_DIRECTORY}", 
+                       type=str, default=config.MBOX_DIRECTORY)
     parser.add_argument("--log-level", help="Override logging level", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], default=None)
     parser.add_argument("--backup", help="Create a backup of the database before processing", action="store_true")
     parser.add_argument("--batch-size", help="Number of emails to process in a single batch", type=int, default=1000)
     parser.add_argument("--version", help="Show version information and exit", action="store_true")
     parser.add_argument("--skip-emails", help="Skip processing email files", action="store_true")
     parser.add_argument("--skip-images", help="Skip processing image files", action="store_true")
+    parser.add_argument("--skip-pdfs", help="Skip processing PDF files", action="store_true")
     parser.add_argument("--no-ui", help="Don't open UI when processing completes", action="store_true")
     parser.add_argument("--port", help="Port for the UI server", type=int, default=config.UI_PORT)
     return parser.parse_args()
@@ -54,6 +58,10 @@ def main() -> int:
     
     # Create directory if it doesn't exist using pathlib
     input_dir = Path(args.directory)
+    
+    # Ensure the data directory exists and is properly set up
+    ensure_data_directory(input_dir)
+    
     if not input_dir.exists():
         try:
             input_dir.mkdir(parents=True, exist_ok=True)
@@ -128,6 +136,31 @@ def main() -> int:
             )
             if image_exit_code != 0 and exit_code == 0:
                 exit_code = image_exit_code
+        
+        # Process PDF files
+        if not args.skip_pdfs and config.DOCUMENT_PROCESSING_ENABLED:
+            logger.info("Starting PDF processing...")
+            pdf_exit_code = process_pdf_files(
+                str(input_dir),
+                logger,
+                metrics
+            )
+            if pdf_exit_code != 0 and exit_code == 0:
+                exit_code = pdf_exit_code
+        
+        # Identify and report unsupported files
+        unsupported_files = identify_unsupported_files(str(input_dir), logger)
+        metrics["unsupported_files"] = unsupported_files
+        
+        if unsupported_files:
+            logger.warning(f"Found {len(unsupported_files)} unsupported files in {input_dir}")
+            for file_info in unsupported_files[:10]:  # Show first 10 only to avoid log spam
+                logger.warning(f"Unsupported file: {file_info['name']} ({file_info['extension']})")
+            
+            if len(unsupported_files) > 10:
+                logger.warning(f"... and {len(unsupported_files) - 10} more unsupported files")
+                
+            logger.warning("To add support for these file types, implement appropriate handlers in the application.")
         
         display_statistics(logger, metrics)
         
