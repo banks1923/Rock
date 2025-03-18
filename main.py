@@ -1,6 +1,7 @@
 import sys
 import logging
 import time
+import os  # Added missing import for os module
 from pathlib import Path
 import config
 from database import create_database
@@ -82,6 +83,12 @@ def main() -> int:
     if args.port != config.UI_PORT:
         config.UI_PORT = args.port
     
+    # Set the root logger to use our logger configuration
+    root_logger = logging.getLogger()
+    for handler in logger.handlers:
+        root_logger.addHandler(handler)
+    root_logger.setLevel(logger.level)
+    
     # Ensure database directory exists
     db_path = Path(config.DATABASE_FILE)
     db_dir = db_path.parent
@@ -93,18 +100,30 @@ def main() -> int:
             logger.error(f"Failed to create database directory: {e}")
             return 1
 
-    if not db_path.exists():
-        try:
-            create_database(str(db_path))
-            logger.info(f"Created database at {db_path}")
-        except Exception as e:
-            logger.exception(f"Failed to create or access the database: {e}")
-            return 1
+    # Log environment information for debugging
+    logger.info(f"Python version: {sys.version}")
+    logger.info(f"Working directory: {os.getcwd()}")
+    logger.info(f"Database path: {config.DATABASE_FILE}")
+    logger.info(f"Input directory: {input_dir}")
+
+    try:
+        # Ensure database exists
+        create_database(str(db_path))
+        logger.info(f"Database ready at {db_path}")
+    except Exception as e:
+        logger.exception(f"Failed to create or access the database: {e}")
+        return 1
 
     metrics = {"start_time": start_time, "processed_files": 0, "processed_emails": 0}
     
     # Start UI server early so it can show progress
-    server, server_thread = start_ui_server(metrics, logger)
+    try:
+        server, server_thread = start_ui_server(metrics, logger)
+    except Exception as e:
+        logger.exception(f"Failed to start UI server: {e}")
+        # Continue without UI
+        server = None
+        server_thread = None
     
     if args.backup:
         if not backup_database(logger):
@@ -164,29 +183,35 @@ def main() -> int:
         
         display_statistics(logger, metrics)
         
-        # Open UI in browser if enabled
-        if config.AUTO_OPEN_UI and not args.no_ui:
-            open_ui_in_browser(logger)
-            
-            # Keep the server running to view results
-            logger.info("UI server is running. Press Ctrl+C to exit.")
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                logger.info("Shutting down UI server...")
+        # Launch UI in browser automatically, every time
+        open_ui_in_browser(logger)
+        logger.info("UI server is running. Press Ctrl+C to exit.")
+
+        # Keep the server running so you can view results
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            logger.info("Shutting down UI server...")
+            if server:
                 server.shutdown()
                 server.server_close()
         
         return exit_code
     except KeyboardInterrupt:
         logger.warning("Process interrupted by user")
-        if 'server' in locals():
+        if server:
             server.shutdown()
             server.server_close()
         return 130
     except Exception as e:
         logger.exception(f"Failed during processing: {e}")
+        if 'server' in locals() and server:
+            try:
+                server.shutdown()
+                server.server_close()
+            except:
+                pass
         return 1
 
 if __name__ == "__main__":

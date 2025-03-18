@@ -14,9 +14,13 @@ def setup_logging() -> logging.Logger:
     """
     Sets up logging with both file and console handlers.
     """
-    logger = logging.getLogger(__name__)
-    if logger.hasHandlers():
-        return logger
+    # Use root logger for application-wide logging
+    logger = logging.getLogger()
+    
+    # Clear existing handlers to avoid duplicates
+    if logger.handlers:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
 
     log_dir = os.path.dirname(config.LOG_FILE)
     if not os.path.exists(log_dir):
@@ -27,26 +31,44 @@ def setup_logging() -> logging.Logger:
 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
-    file_handler = logging.FileHandler(config.LOG_FILE)
-    file_handler.setLevel(log_level)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    try:
+        file_handler = logging.FileHandler(config.LOG_FILE)
+        file_handler.setLevel(log_level)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    except Exception as e:
+        print(f"Warning: Could not set up file logging: {e}")
+        # Continue without file logging
 
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(log_level)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
+    # Set module loggers to use the root logger's level
+    logging.getLogger('email_processor').setLevel(log_level)
+    logging.getLogger('database').setLevel(log_level)
+    logging.getLogger('thread_utils').setLevel(log_level)
+
     return logger
 
 def get_file_hash(file_path):
     """
     Calculate SHA256 hash of a file to detect changes.
+    Optimizes for large files using memory-mapped file reading.
     """
     sha256 = hashlib.sha256()
-    with open(file_path, 'rb') as f:
-        for chunk in iter(lambda: f.read(4096), b''):
-            sha256.update(chunk)
+    file_size = os.path.getsize(file_path)
+    threshold = 10 * 1024 * 1024  # Use mmap if file is larger than 10 MB
+    if file_size > threshold:
+        with open(file_path, 'rb') as f:
+            import mmap
+            with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+                sha256.update(mm)
+    else:
+        with open(file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(4096), b''):
+                sha256.update(chunk)
     return sha256.hexdigest()
 
 def backup_database(logger):

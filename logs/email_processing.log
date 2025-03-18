@@ -387,3 +387,21 @@ TypeError: 'mbox' object does not support the context manager protocol
 2025-03-16 13:52:44 - INFO - utils - display_statistics - - Emails processed: 0
 2025-03-16 13:52:44 - INFO - utils - display_statistics - - Total execution time: 8.60 seconds
 2025-03-16 13:52:44 - INFO - utils - display_statistics - ==================================================
+2025-03-17 01:11:46 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-17 01:11:46 - INFO - main - main - Starting email processing...
+2025-03-17 01:11:46 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-17 01:11:46 - INFO - main - main - Starting image processing...
+2025-03-17 01:11:46 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-17 01:11:46 - INFO - main - main - Starting PDF processing...
+2025-03-17 01:11:46 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-17 01:11:46 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-17 01:11:46 - INFO - utils - display_statistics - ==================================================
+2025-03-17 01:11:46 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-17 01:11:46 - INFO - utils - display_statistics - Total processing time: 0.02 seconds
+2025-03-17 01:11:46 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-17 01:11:46 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-17 01:11:46 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-17 01:11:46 - INFO - utils - display_statistics - ==================================================
+2025-03-17 01:11:46 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-17 01:11:46 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-17 16:35:56 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]

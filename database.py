@@ -1,7 +1,7 @@
 import sqlite3
 import logging
 import time
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from exceptions import DatabaseError
 import config
 
@@ -11,14 +11,19 @@ def create_database(database_file: str) -> bool:
     """
     Creates the SQLite database and table if they don't exist.
 
+    Args:
+        database_file: Path to the database file
+
     Returns:
         True if successful, raises an error otherwise.
+        
     Raises:
         DatabaseError: If an error occurs during database creation.
     """
     logger.info(f"Creating database: {database_file}")
     try:
         with sqlite3.connect(database_file) as conn:
+            # Create emails table
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS emails (
                     message_id TEXT PRIMARY KEY,
@@ -27,14 +32,32 @@ def create_database(database_file: str) -> bool:
                     receiver TEXT,
                     subject TEXT,
                     content TEXT,
-                    keywords TEXT
+                    keywords TEXT,
+                    thread_id TEXT
                 )
             ''')
-            # Create an index on the date column to optimize timeline queries
+            
+            # Create indices for performance
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_date ON emails(date)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_thread_id ON emails(thread_id)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_sender ON emails(sender)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_subject ON emails(subject)')
+            
+            # Create thread metadata table
             conn.execute('''
-                CREATE INDEX IF NOT EXISTS idx_date ON emails(date)
+                CREATE TABLE IF NOT EXISTS email_threads (
+                    thread_id TEXT PRIMARY KEY,
+                    subject TEXT,
+                    participants TEXT,
+                    start_date DATETIME,
+                    last_update DATETIME,
+                    message_count INTEGER
+                )
             ''')
-        return True
+            
+            conn.commit()
+            logger.info("Database schema created successfully")
+            return True
     except sqlite3.Error as e:
         logger.error(f"Database error while creating database: {e}")
         raise DatabaseError(f"Error creating database: {e}") from e
@@ -50,8 +73,10 @@ def insert_email_data(emails: List[Dict[str, Any]], database_file: str, batch_si
         emails: A list of email dictionaries.
         database_file: The path to the database file.
         batch_size: Number of records to insert in a single batch.
+        
     Returns:
         The number of rows inserted.
+        
     Raises:
         DatabaseError: on database errors
     """
@@ -68,6 +93,9 @@ def insert_email_data(emails: List[Dict[str, Any]], database_file: str, batch_si
         with sqlite3.connect(database_file) as conn:
             # Enable WAL mode for better concurrent performance
             conn.execute("PRAGMA journal_mode = WAL")
+            conn.execute("PRAGMA synchronous = NORMAL")
+            conn.execute("PRAGMA temp_store = MEMORY")
+            conn.execute("PRAGMA cache_size = 10000")
             
             # Process emails in batches
             for i in range(0, len(emails), batch_size):
@@ -80,8 +108,9 @@ def insert_email_data(emails: List[Dict[str, Any]], database_file: str, batch_si
                         email['sender'],
                         email['receiver'],
                         email['subject'],
-                        email['content'],   # Using 'content' (consistent with the parser)
+                        email['content'],
                         email['keywords'],
+                        email.get('thread_id', None)  # Add thread_id to the insert
                     )
                     for email in batch
                 ]
@@ -91,9 +120,9 @@ def insert_email_data(emails: List[Dict[str, Any]], database_file: str, batch_si
                 
                 cursor.executemany(
                     """
-                    INSERT OR IGNORE INTO emails (
-                        message_id, date, sender, receiver, subject, content, keywords
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO emails (
+                        message_id, date, sender, receiver, subject, content, keywords, thread_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     data_to_insert,
                 )
@@ -118,54 +147,6 @@ def insert_email_data(emails: List[Dict[str, Any]], database_file: str, batch_si
         logger.exception(f"Unexpected error inserting data: {e}")
         raise DatabaseError(f"Error inserting data: {e}") from e
 
-def update_database_schema(database_file: str) -> bool:
-    """
-    Updates the database schema to add support for email threading.
-    
-    Args:
-        database_file: Path to the SQLite database file
-    
-    Returns:
-        True if successful
-    
-    Raises:
-        DatabaseError: If an error occurs during schema update
-    """
-    logger.info(f"Updating database schema: {database_file}")
-    try:
-        with sqlite3.connect(database_file) as conn:
-            # Check if thread_id column already exists
-            cursor = conn.cursor()
-            cursor.execute("PRAGMA table_info(emails)")
-            columns = [col[1] for col in cursor.fetchall()]
-            
-            if 'thread_id' not in columns:
-                logger.info("Adding thread_id column to emails table")
-                conn.execute("ALTER TABLE emails ADD COLUMN thread_id TEXT")
-                # Create an index on thread_id for thread queries
-                conn.execute("CREATE INDEX idx_thread_id ON emails(thread_id)")
-            
-            # Add a new table for thread metadata if it doesn't exist
-            conn.execute('''
-                CREATE TABLE IF NOT EXISTS email_threads (
-                    thread_id TEXT PRIMARY KEY,
-                    subject TEXT,
-                    participants TEXT,
-                    start_date DATETIME,
-                    last_update DATETIME,
-                    message_count INTEGER
-                )
-            ''')
-            
-            return True
-            
-    except sqlite3.Error as e:
-        logger.error(f"Database error while updating schema: {e}")
-        raise DatabaseError(f"Error updating database schema: {e}") from e
-    except Exception as e:
-        logger.exception(f"Unexpected error updating database schema: {e}")
-        raise DatabaseError(f"Error updating database schema: {e}") from e
-
 def update_thread_info(thread_id: str, emails: List[Dict[str, Any]], database_file: str) -> bool:
     """
     Update or insert thread metadata in the database.
@@ -181,7 +162,7 @@ def update_thread_info(thread_id: str, emails: List[Dict[str, Any]], database_fi
     Raises:
         DatabaseError: On database errors
     """
-    if not emails:
+    if not emails or not thread_id:
         return True
         
     try:
@@ -189,16 +170,16 @@ def update_thread_info(thread_id: str, emails: List[Dict[str, Any]], database_fi
         subjects = [e.get('subject', '') for e in emails if e.get('subject')]
         normalized_subject = subjects[0] if subjects else ""
         
-        senders = set([e.get('sender', '') for e in emails if e.get('sender')])
-        receivers = set([e.get('receiver', '') for e in emails if e.get('receiver')])
-        participants = ','.join(sorted(senders.union(receivers)))
+        senders = set(e.get('sender', '') for e in emails if e.get('sender'))
+        receivers = set(e.get('receiver', '') for e in emails if e.get('receiver'))
+        participants = ','.join(sorted(filter(None, senders.union(receivers))))
         
-        # Find earliest and latest dates
-        dates = [e.get('date') for e in emails if e.get('date')]
-        start_date = min(dates) if dates else None
-        last_update = max(dates) if dates else None
+        dates = [e.get('date') for e in emails if e.get('date') is not None]
+        start_date = min(dates, default=None)
+        last_update = max([date for date in dates if date is not None]) if dates else None
         
         with sqlite3.connect(database_file) as conn:
+            # Insert or replace thread metadata
             conn.execute("""
                 INSERT OR REPLACE INTO email_threads 
                 (thread_id, subject, participants, start_date, last_update, message_count)
@@ -213,12 +194,16 @@ def update_thread_info(thread_id: str, emails: List[Dict[str, Any]], database_fi
             ))
             
             # Update thread_id for all emails in the thread
-            cursor = conn.cursor()
-            for email in emails:
-                if email.get('message_id'):
-                    cursor.execute("""
-                        UPDATE emails SET thread_id = ? WHERE message_id = ?
-                    """, (thread_id, email['message_id']))
+            message_ids = [email.get('message_id') for email in emails if email.get('message_id')]
+            if message_ids:
+                # Use parameter substitution for SQL safety
+                placeholders = ','.join(['?'] * len(message_ids))
+                conn.execute(f"""
+                    UPDATE emails SET thread_id = ? 
+                    WHERE message_id IN ({placeholders})
+                """, [thread_id] + message_ids)
+            
+            conn.commit()
         
         return True
         
@@ -228,3 +213,37 @@ def update_thread_info(thread_id: str, emails: List[Dict[str, Any]], database_fi
     except Exception as e:
         logger.error(f"Unexpected error updating thread info: {e}")
         raise DatabaseError(f"Error updating thread info: {e}") from e
+
+def get_thread_emails(thread_id: str, database_file: str) -> List[Dict[str, Any]]:
+    """
+    Retrieve all emails belonging to a specific thread.
+    
+    Args:
+        thread_id: The thread identifier
+        database_file: Path to the database file
+        
+    Returns:
+        List of email dictionaries in the thread
+        
+    Raises:
+        DatabaseError: On database errors
+    """
+    try:
+        with sqlite3.connect(database_file) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT * FROM emails 
+                WHERE thread_id = ? 
+                ORDER BY date ASC
+            """, (thread_id,))
+            
+            return [dict(row) for row in cursor.fetchall()]
+            
+    except sqlite3.Error as e:
+        logger.error(f"Database error retrieving thread emails: {e}")
+        raise DatabaseError(f"Error retrieving thread emails: {e}") from e
+    except Exception as e:
+        logger.error(f"Unexpected error retrieving thread emails: {e}")
+        raise DatabaseError(f"Error retrieving thread emails: {e}") from e

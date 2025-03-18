@@ -2,15 +2,48 @@ import os
 import logging
 import mailbox
 import time
+import sys
 from typing import List, Dict, Optional, Any, Iterator, Generator
 from pathlib import Path
 
-from email_parser import parse_email
-from exceptions import EmailParsingError
-from database import insert_email_data
-import config
-from utils import get_file_hash, check_memory_usage
-from thread_utils import ThreadIdentifier
+# Make sure thread_utils can be found
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Try different import approaches to handle potential issues
+try:
+    from email_parser import parse_email
+    from exceptions import EmailParsingError
+    from database import insert_email_data, update_thread_info
+    import config
+    from utils import get_file_hash, check_memory_usage
+    
+    # Try to import ThreadIdentifier, fallback to a simple implementation if not available
+    try:
+        from thread_utils import ThreadIdentifier
+    except ImportError:
+        # Simple fallback implementation
+        class ThreadIdentifier:
+            def __init__(self):
+                self.threads = {}
+                self.next_id = 1
+                
+            def get_thread_count(self):
+                return len(self.threads)
+                
+            def identify_thread(self, email):
+                if not email or 'message_id' not in email:
+                    return None
+                message_id = email['message_id']
+                if message_id in self.threads:
+                    return self.threads[message_id]
+                thread_id = f"thread-{self.next_id}"
+                self.next_id += 1
+                self.threads[message_id] = thread_id
+                return thread_id
+                
+except ImportError as e:
+    print(f"Error importing required modules: {e}")
+    sys.exit(1)
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +118,7 @@ def process_mbox_files(directory: str, logger=None, dry_run: bool = False,
             # Process the file in batches for better memory management
             batch_metrics = {"total_emails": 0, "processed_emails": 0}
             
-            # First, count the total emails in the mbox (efficient approach)
-            # FIX: Don't use context manager with mailbox.mbox
+            # First, count the total emails in the mbox
             mb = None
             try:
                 mb = mailbox.mbox(mbox_file)
@@ -97,12 +129,37 @@ def process_mbox_files(directory: str, logger=None, dry_run: bool = False,
             
             # Then process in batches
             for batch in process_mbox_batches(mbox_file, batch_size, logger, batch_metrics):
+                # Group emails by thread if threading is enabled
+                if use_threading and not dry_run:
+                    thread_groups = {}
+                    
+                    for email in batch:
+                        if thread_identifier:  # Check that thread_identifier exists
+                            thread_id = thread_identifier.identify_thread(email)
+                            if thread_id:
+                                thread_groups.setdefault(thread_id, []).append(email)
+                                # Add thread_id to each email
+                                email['thread_id'] = thread_id
+                    
+                    # Update thread stats
+                    if thread_identifier and thread_stats:
+                        thread_stats["thread_count"] = thread_identifier.get_thread_count()
+                        thread_stats["emails_grouped"] += len(batch)
+                
                 if not dry_run:
                     try:
                         inserted = insert_email_data(batch, config.DATABASE_FILE, batch_size)
                         logger.info(f"Inserted {inserted} emails from batch")
                         metrics["processed_emails"] += inserted
                         batch_metrics["processed_emails"] += inserted
+                        
+                        # Update thread information in the database
+                        if use_threading and thread_groups:
+                            for thread_id, thread_emails in thread_groups.items():
+                                try:
+                                    update_thread_info(thread_id, thread_emails, config.DATABASE_FILE)
+                                except Exception as e:
+                                    logger.error(f"Error updating thread info for {thread_id}: {e}")
                     except Exception as e:
                         logger.exception(f"Error inserting batch from {mbox_file}: {e}")
                 else:
@@ -115,31 +172,6 @@ def process_mbox_files(directory: str, logger=None, dry_run: bool = False,
                 if not check_memory_usage(max_memory_pct, logger):
                     logger.warning("Memory usage too high after batch, pausing processing")
                     return 2
-                
-                # Group emails by thread before insertion
-                if use_threading and not dry_run:
-                    thread_groups = {}
-                    
-                    for email in batch:
-                        thread_id = thread_identifier.identify_thread(email)
-                        thread_groups.setdefault(thread_id, []).append(email)
-                        
-                    # Update thread stats
-                    thread_stats["thread_count"] = thread_identifier.get_thread_count()
-                    thread_stats["emails_grouped"] += len(batch)
-                    
-                    # Update database with thread information for each group
-                    for thread_id, thread_emails in thread_groups.items():
-                        try:
-                            # Add thread_id to each email
-                            for email in thread_emails:
-                                email['thread_id'] = thread_id
-                                
-                            # Update thread metadata
-                            if not dry_run:
-                                update_thread_info(thread_id, thread_emails, config.DATABASE_FILE)
-                        except Exception as e:
-                            logger.error(f"Error processing thread {thread_id}: {e}")
             
             metrics["processed_files"] += 1
             logger.info(f"Completed processing {mbox_file}: {batch_metrics['processed_emails']} of {batch_metrics['total_emails']} emails processed")
