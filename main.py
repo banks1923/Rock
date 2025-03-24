@@ -33,6 +33,8 @@ def parse_args():
     parser.add_argument("--skip-pdfs", help="Skip processing PDF files", action="store_true")
     parser.add_argument("--no-ui", help="Don't open UI when processing completes", action="store_true")
     parser.add_argument("--port", help="Port for the UI server", type=int, default=config.UI_PORT)
+    parser.add_argument("--query", "-q", help="Run SQL query and display results", type=str, default=None)
+    parser.add_argument("--output", "-o", help="Output file for query results (CSV format)", type=str, default=None)
     return parser.parse_args()
 
 def main() -> int:
@@ -118,27 +120,61 @@ def main() -> int:
     
     # Start UI server early so it can show progress
     try:
-        server, server_thread = start_ui_server(metrics, logger)
+        server, _ = start_ui_server(metrics, logger, str(db_path))
     except Exception as e:
         logger.exception(f"Failed to start UI server: {e}")
         # Continue without UI
         server = None
-        server_thread = None
+    
+    if args.query:
+        try:
+            from database_query import execute_query_command
+            execute_query_command(args.query, output_file=args.output, logger=logger)
+            # Exit after query execution if not running a query
+            return 0
+        except ImportError:
+            logger.error("The 'database_query' module could not be found. Ensure 'database_query.py' exists and is accessible.")
+            return 1
     
     if args.backup:
         if not backup_database(logger):
             logger.error("Database backup failed, aborting")
             return 1
     
+    # Ensure data directory is fully accessible
     try:
-        exit_code = 0
-        
+        # Test write access to data directory
+        test_file = input_dir / ".test_access"
+        with open(test_file, 'w') as f:
+            f.write("test")
+        os.remove(test_file)
+        logger.info(f"Confirmed write access to data directory: {input_dir}")
+    except Exception as e:
+        logger.error(f"Cannot write to data directory {input_dir}: {e}")
+        print(f"Error: Cannot write to data directory {input_dir}")
+        print("Please check directory permissions and try again.")
+        return 1
+    
+    exit_code = 0
+    
+    try:
         # Process email files
         if not args.skip_emails:
             logger.info("Starting email processing...")
+            logger.info(f"Looking for .mbox files in: {input_dir}")
+            
+            # Count mbox files before processing
+            mbox_files = list(input_dir.glob('*.mbox')) + list(input_dir.glob('*.MBOX'))
+            if not mbox_files:
+                logger.warning(f"No .mbox files found in directory: {input_dir}")
+                metrics["warning"] = "No .mbox files found in input directory"
+            else:
+                logger.info(f"Found {len(mbox_files)} .mbox files to process")
+                metrics["mbox_files_found"] = len(mbox_files)
+            
             email_exit_code = process_mbox_files(
                 str(input_dir),  # Convert Path to string for compatibility
-                logger, 
+                logger,
                 batch_size=args.batch_size,
                 metrics=metrics
             )
@@ -151,7 +187,7 @@ def main() -> int:
             image_exit_code = process_image_files(
                 str(input_dir),
                 logger,
-                metrics
+                metrics=metrics
             )
             if image_exit_code != 0 and exit_code == 0:
                 exit_code = image_exit_code
@@ -162,7 +198,7 @@ def main() -> int:
             pdf_exit_code = process_pdf_files(
                 str(input_dir),
                 logger,
-                metrics
+                metrics=metrics
             )
             if pdf_exit_code != 0 and exit_code == 0:
                 exit_code = pdf_exit_code
@@ -178,24 +214,23 @@ def main() -> int:
             
             if len(unsupported_files) > 10:
                 logger.warning(f"... and {len(unsupported_files) - 10} more unsupported files")
-                
-            logger.warning("To add support for these file types, implement appropriate handlers in the application.")
         
         display_statistics(logger, metrics)
         
-        # Launch UI in browser automatically, every time
-        open_ui_in_browser(logger)
-        logger.info("UI server is running. Press Ctrl+C to exit.")
-
-        # Keep the server running so you can view results
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            logger.info("Shutting down UI server...")
-            if server:
-                server.shutdown()
-                server.server_close()
+        if not args.no_ui:
+            # Launch UI in browser automatically, every time
+            open_ui_in_browser(logger)
+            logger.info("UI server is running. Press Ctrl+C to exit.")
+        
+            # Keep the server running so you can view results
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                logger.info("Shutting down UI server...")
+                if server:
+                    server.shutdown()
+                    server.server_close()
         
         return exit_code
     except KeyboardInterrupt:
@@ -213,6 +248,3 @@ def main() -> int:
             except:
                 pass
         return 1
-
-if __name__ == "__main__":
-    sys.exit(main())

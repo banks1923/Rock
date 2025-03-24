@@ -4,6 +4,7 @@ import time
 from typing import List, Dict, Any, Optional
 from exceptions import DatabaseError
 import config
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ def create_database(database_file: str) -> bool:
     logger.info(f"Creating database: {database_file}")
     try:
         with sqlite3.connect(database_file) as conn:
-            # Create emails table
+            # Create emails table if it doesn't exist
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS emails (
                     message_id TEXT PRIMARY KEY,
@@ -36,6 +37,12 @@ def create_database(database_file: str) -> bool:
                     thread_id TEXT
                 )
             ''')
+            # If table exists from a previous version, ensure thread_id column is present
+            cursor = conn.execute("PRAGMA table_info(emails)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if 'thread_id' not in columns:
+                logger.info("Adding missing 'thread_id' column to emails table")
+                conn.execute("ALTER TABLE emails ADD COLUMN thread_id TEXT")
             
             # Create indices for performance
             conn.execute('CREATE INDEX IF NOT EXISTS idx_date ON emails(date)')
@@ -175,8 +182,8 @@ def update_thread_info(thread_id: str, emails: List[Dict[str, Any]], database_fi
         participants = ','.join(sorted(filter(None, senders.union(receivers))))
         
         dates = [e.get('date') for e in emails if e.get('date') is not None]
-        start_date = min(dates, default=None)
-        last_update = max([date for date in dates if date is not None]) if dates else None
+        start_date = min(d for d in dates if d is not None) if dates else None
+        last_update = max(d for d in dates if d is not None) if dates else None
         
         with sqlite3.connect(database_file) as conn:
             # Insert or replace thread metadata
@@ -247,3 +254,51 @@ def get_thread_emails(thread_id: str, database_file: str) -> List[Dict[str, Any]
     except Exception as e:
         logger.error(f"Unexpected error retrieving thread emails: {e}")
         raise DatabaseError(f"Error retrieving thread emails: {e}") from e
+
+def validate_database(database_file: str) -> Dict[str, Any]:
+    """
+    Validates that the database exists and has the correct schema.
+    
+    Args:
+        database_file: Path to the database file
+        
+    Returns:
+        Dictionary with validation results
+    """
+    results = {
+        "exists": False,
+        "valid": False,
+        "tables": [],
+        "errors": []
+    }
+    
+    if not os.path.exists(database_file):
+        results["errors"].append(f"Database file not found: {database_file}")
+        return results
+        
+    results["exists"] = True
+    
+    try:
+        with sqlite3.connect(database_file) as conn:
+            cursor = conn.cursor()
+            # Check tables
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = [row[0] for row in cursor.fetchall()]
+            results["tables"] = tables
+            
+            required_tables = ["emails"]
+            for table in required_tables:
+                if table not in tables:
+                    results["errors"].append(f"Required table not found: {table}")
+                    
+            # Check email count
+            if "emails" in tables:
+                cursor.execute("SELECT COUNT(*) FROM emails")
+                results["email_count"] = cursor.fetchone()[0]
+            
+            results["valid"] = len(results["errors"]) == 0
+    except Exception as e:
+        results["errors"].append(f"Error validating database: {str(e)}")
+        results["valid"] = False
+        
+    return results

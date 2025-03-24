@@ -19,10 +19,11 @@ try:
     
     # Try to import ThreadIdentifier, fallback to a simple implementation if not available
     try:
-        from thread_utils import ThreadIdentifier
+        from thread_utils import ThreadIdentifier as RealThreadIdentifier
+        ThreadIdentifier = RealThreadIdentifier
     except ImportError:
         # Simple fallback implementation
-        class ThreadIdentifier:
+        class SimpleThreadIdentifier:
             def __init__(self):
                 self.threads = {}
                 self.next_id = 1
@@ -40,6 +41,8 @@ try:
                 self.next_id += 1
                 self.threads[message_id] = thread_id
                 return thread_id
+        
+        ThreadIdentifier = SimpleThreadIdentifier
                 
 except ImportError as e:
     print(f"Error importing required modules: {e}")
@@ -73,18 +76,28 @@ def process_mbox_files(directory: str, logger=None, dry_run: bool = False,
     if logger is None:
         logger = logging.getLogger(__name__)
     
-    dir_path = Path(directory)
+    # Accept either string or Path object
+    if isinstance(directory, Path):
+        dir_path = directory
+    else:
+        dir_path = Path(directory)
+
+    logger.info(f"Looking for mbox files in: {dir_path.absolute()}")
+    
     if not dir_path.exists():
         logger.error(f"Directory does not exist: {directory}")
+        metrics["error"] = f"Directory not found: {directory}"
         return 1
         
-    # Use Path.glob for efficient directory listing with pattern matching
-    mbox_files = list(dir_path.glob('*.mbox'))
+    # Look for both .mbox and .MBOX files (case-insensitive)
+    mbox_files = list(dir_path.glob('*.mbox')) + list(dir_path.glob('*.MBOX'))
+    
     if not mbox_files:
         logger.warning(f"No .mbox files found in directory: {directory}")
+        metrics["warning"] = "No .mbox files found"
         return 0
         
-    logger.info(f"Found {len(mbox_files)} .mbox files to process")
+    logger.info(f"Found {len(mbox_files)} .mbox files to process: {[f.name for f in mbox_files]}")
     
     # Initialize thread identifier if threading is enabled
     thread_identifier = ThreadIdentifier() if use_threading else None
@@ -186,7 +199,7 @@ def process_mbox_files(directory: str, logger=None, dry_run: bool = False,
     
     return 0
 
-def process_mbox_batches(mbox_file: str, batch_size: int, logger, metrics: Dict = None) -> Generator[List[Dict[str, Any]], None, None]:
+def process_mbox_batches(mbox_file: str, batch_size: int, logger, metrics: Optional[Dict[str, Any]] = None) -> Generator[List[Dict[str, Any]], None, None]:
     """
     Generator that processes an mbox file in batches to control memory usage.
     

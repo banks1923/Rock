@@ -405,3 +405,275 @@ TypeError: 'mbox' object does not support the context manager protocol
 2025-03-17 01:11:46 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
 2025-03-17 01:11:46 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
 2025-03-17 16:35:56 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 18:03:59 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 18:03:59 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 18:03:59 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:03:59 - INFO - main - main - Input directory: data
+2025-03-17 18:03:59 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:03:59 - ERROR - database - create_database - Database error while creating database: no such column: thread_id
+2025-03-17 18:03:59 - ERROR - main - main - Failed to create or access the database: Error creating database: no such column: thread_id
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/database.py", line 42, in create_database
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_thread_id ON emails(thread_id)')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: thread_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 111, in main
+    create_database(str(db_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/database.py", line 63, in create_database
+    raise DatabaseError(f"Error creating database: {e}") from e
+exceptions.DatabaseError: Error creating database: no such column: thread_id
+2025-03-17 18:45:53 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 18:45:53 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 18:45:53 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:45:53 - INFO - main - main - Input directory: data
+2025-03-17 18:45:53 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:45:53 - ERROR - database - create_database - Database error while creating database: no such column: thread_id
+2025-03-17 18:45:53 - ERROR - main - main - Failed to create or access the database: Error creating database: no such column: thread_id
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/database.py", line 42, in create_database
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_thread_id ON emails(thread_id)')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: thread_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 111, in main
+    create_database(str(db_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/database.py", line 63, in create_database
+    raise DatabaseError(f"Error creating database: {e}") from e
+exceptions.DatabaseError: Error creating database: no such column: thread_id
+2025-03-17 18:46:41 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 18:46:41 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 18:46:41 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:46:41 - INFO - main - main - Input directory: data
+2025-03-17 18:46:41 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:46:41 - ERROR - database - create_database - Database error while creating database: no such column: thread_id
+2025-03-17 18:46:41 - ERROR - main - main - Failed to create or access the database: Error creating database: no such column: thread_id
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/database.py", line 42, in create_database
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_thread_id ON emails(thread_id)')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: thread_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 111, in main
+    create_database(str(db_path))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/database.py", line 63, in create_database
+    raise DatabaseError(f"Error creating database: {e}") from e
+exceptions.DatabaseError: Error creating database: no such column: thread_id
+2025-03-17 18:54:07 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 18:54:07 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 18:54:07 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:54:07 - INFO - main - main - Input directory: data
+2025-03-17 18:54:07 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:54:07 - INFO - database - create_database - Adding missing 'thread_id' column to emails table
+2025-03-17 18:54:07 - INFO - database - create_database - Database schema created successfully
+2025-03-17 18:54:07 - INFO - main - main - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:54:07 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-17 18:54:07 - INFO - main - main - Starting email processing...
+2025-03-17 18:54:07 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-17 18:54:07 - INFO - main - main - Starting image processing...
+2025-03-17 18:54:07 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-17 18:54:07 - INFO - main - main - Starting PDF processing...
+2025-03-17 18:54:07 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-17 18:54:07 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-17 18:54:07 - WARNING - main - main - Found 1 unsupported files in data
+2025-03-17 18:54:07 - WARNING - main - main - Unsupported file: .DS_Store ()
+2025-03-17 18:54:07 - WARNING - main - main - To add support for these file types, implement appropriate handlers in the application.
+2025-03-17 18:54:07 - INFO - utils - display_statistics - ==================================================
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Total processing time: 0.02 seconds
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Unsupported files: 1
+2025-03-17 18:54:07 - INFO - utils - display_statistics - Unsupported file types:
+2025-03-17 18:54:07 - INFO - utils - display_statistics -   no extension: 1 file(s)
+2025-03-17 18:54:07 - INFO - utils - display_statistics - ==================================================
+2025-03-17 18:54:07 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-17 18:54:07 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-17 18:59:18 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 18:59:18 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 18:59:18 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:59:18 - INFO - main - main - Input directory: data
+2025-03-17 18:59:18 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:59:18 - INFO - database - create_database - Database schema created successfully
+2025-03-17 18:59:18 - INFO - main - main - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-17 18:59:18 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-17 18:59:18 - INFO - main - main - Starting email processing...
+2025-03-17 18:59:18 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-17 18:59:18 - INFO - main - main - Starting image processing...
+2025-03-17 18:59:18 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-17 18:59:18 - INFO - main - main - Starting PDF processing...
+2025-03-17 18:59:18 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-17 18:59:18 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-17 18:59:18 - WARNING - main - main - Found 1 unsupported files in data
+2025-03-17 18:59:18 - WARNING - main - main - Unsupported file: .DS_Store ()
+2025-03-17 18:59:18 - WARNING - main - main - To add support for these file types, implement appropriate handlers in the application.
+2025-03-17 18:59:18 - INFO - utils - display_statistics - ==================================================
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Total processing time: 0.01 seconds
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Unsupported files: 1
+2025-03-17 18:59:18 - INFO - utils - display_statistics - Unsupported file types:
+2025-03-17 18:59:18 - INFO - utils - display_statistics -   no extension: 1 file(s)
+2025-03-17 18:59:18 - INFO - utils - display_statistics - ==================================================
+2025-03-17 18:59:18 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-17 18:59:18 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-17 19:03:02 - INFO - main - main - Shutting down UI server...
+2025-03-17 19:03:07 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 19:03:07 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 19:03:07 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:03:07 - INFO - main - main - Input directory: data
+2025-03-17 19:03:07 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:03:07 - INFO - database - create_database - Database schema created successfully
+2025-03-17 19:03:07 - INFO - main - main - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:03:07 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-17 19:03:07 - INFO - main - main - Starting email processing...
+2025-03-17 19:03:07 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-17 19:03:07 - INFO - main - main - Starting image processing...
+2025-03-17 19:03:07 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-17 19:03:07 - INFO - main - main - Starting PDF processing...
+2025-03-17 19:03:07 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-17 19:03:07 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-17 19:03:07 - WARNING - main - main - Found 1 unsupported files in data
+2025-03-17 19:03:07 - WARNING - main - main - Unsupported file: .DS_Store ()
+2025-03-17 19:03:07 - WARNING - main - main - To add support for these file types, implement appropriate handlers in the application.
+2025-03-17 19:03:07 - INFO - utils - display_statistics - ==================================================
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Total processing time: 0.01 seconds
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Unsupported files: 1
+2025-03-17 19:03:07 - INFO - utils - display_statistics - Unsupported file types:
+2025-03-17 19:03:07 - INFO - utils - display_statistics -   no extension: 1 file(s)
+2025-03-17 19:03:07 - INFO - utils - display_statistics - ==================================================
+2025-03-17 19:03:08 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-17 19:03:08 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-17 19:04:25 - INFO - main - main - Shutting down UI server...
+2025-03-17 19:04:29 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 19:04:29 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 19:04:29 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:04:29 - INFO - main - main - Input directory: data
+2025-03-17 19:04:29 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:04:29 - INFO - database - create_database - Database schema created successfully
+2025-03-17 19:04:29 - INFO - main - main - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:04:29 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-17 19:04:29 - INFO - main - main - Starting email processing...
+2025-03-17 19:04:29 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-17 19:04:29 - INFO - main - main - Starting image processing...
+2025-03-17 19:04:29 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-17 19:04:29 - INFO - main - main - Starting PDF processing...
+2025-03-17 19:04:29 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-17 19:04:29 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-17 19:04:29 - WARNING - main - main - Found 2 unsupported files in data
+2025-03-17 19:04:29 - WARNING - main - main - Unsupported file: .DS_Store ()
+2025-03-17 19:04:29 - WARNING - main - main - Unsupported file: mbox ()
+2025-03-17 19:04:29 - WARNING - main - main - To add support for these file types, implement appropriate handlers in the application.
+2025-03-17 19:04:29 - INFO - utils - display_statistics - ==================================================
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Total processing time: 0.01 seconds
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Unsupported files: 2
+2025-03-17 19:04:29 - INFO - utils - display_statistics - Unsupported file types:
+2025-03-17 19:04:29 - INFO - utils - display_statistics -   no extension: 2 file(s)
+2025-03-17 19:04:29 - INFO - utils - display_statistics - ==================================================
+2025-03-17 19:04:29 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-17 19:04:29 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-17 19:05:05 - INFO - main - main - Shutting down UI server...
+2025-03-17 19:12:37 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-17 19:12:37 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-17 19:12:37 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:12:37 - INFO - main - main - Input directory: data
+2025-03-17 19:12:37 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:12:37 - INFO - database - create_database - Database schema created successfully
+2025-03-17 19:12:37 - INFO - main - main - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-17 19:12:37 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-17 19:12:37 - INFO - main - main - Confirmed write access to data directory: data
+2025-03-17 19:12:37 - INFO - main - main - Starting email processing...
+2025-03-17 19:12:37 - INFO - main - main - Looking for .mbox files in: data
+2025-03-17 19:12:37 - WARNING - main - main - No .mbox files found in directory: data
+2025-03-17 19:12:37 - INFO - email_processor - process_mbox_files - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-17 19:12:37 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-17 19:12:37 - INFO - main - main - Starting image processing...
+2025-03-17 19:12:37 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-17 19:12:37 - INFO - main - main - Starting PDF processing...
+2025-03-17 19:12:37 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-17 19:12:37 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-17 19:12:37 - WARNING - main - main - Found 2 unsupported files in data
+2025-03-17 19:12:37 - WARNING - main - main - Unsupported file: .DS_Store ()
+2025-03-17 19:12:37 - WARNING - main - main - Unsupported file: mbox ()
+2025-03-17 19:12:37 - WARNING - main - main - To add support for these file types, implement appropriate handlers in the application.
+2025-03-17 19:12:37 - INFO - utils - display_statistics - ==================================================
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Total processing time: 0.02 seconds
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Unsupported files: 2
+2025-03-17 19:12:37 - INFO - utils - display_statistics - Unsupported file types:
+2025-03-17 19:12:37 - INFO - utils - display_statistics -   no extension: 2 file(s)
+2025-03-17 19:12:37 - INFO - utils - display_statistics - ==================================================
+2025-03-17 19:12:37 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-17 19:12:37 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-17 19:39:59 - INFO - main - main - Shutting down UI server...
+2025-03-18 17:44:28 - INFO - main - main - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-18 17:44:28 - INFO - main - main - Working directory: /Users/Shared/stonev2.03
+2025-03-18 17:44:28 - INFO - main - main - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-18 17:44:28 - INFO - main - main - Input directory: data
+2025-03-18 17:44:28 - INFO - database - create_database - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-18 17:44:28 - INFO - database - create_database - Database schema created successfully
+2025-03-18 17:44:28 - INFO - main - main - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-18 17:44:28 - INFO - ui_manager - start_ui_server - UI server started at http://127.0.0.1:8080
+2025-03-18 17:44:28 - ERROR - main - main - Failed to start UI server: name 'app' is not defined
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 121, in main
+    server, server_thread = start_ui_server(metrics, logger, str(db_path))
+                            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/ui_manager.py", line 666, in start_ui_server
+    @app.route('/api/query', methods=['POST'])
+     ^^^
+NameError: name 'app' is not defined
+2025-03-18 17:44:28 - INFO - main - main - Confirmed write access to data directory: data
+2025-03-18 17:44:28 - INFO - main - main - Starting email processing...
+2025-03-18 17:44:28 - INFO - main - main - Looking for .mbox files in: data
+2025-03-18 17:44:28 - WARNING - main - main - No .mbox files found in directory: data
+2025-03-18 17:44:28 - INFO - email_processor - process_mbox_files - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-18 17:44:28 - WARNING - email_processor - process_mbox_files - No .mbox files found in directory: data
+2025-03-18 17:44:28 - INFO - main - main - Starting image processing...
+2025-03-18 17:44:28 - INFO - image_processor - process_image_files - No image files found in data
+2025-03-18 17:44:28 - INFO - main - main - Starting PDF processing...
+2025-03-18 17:44:28 - INFO - pdf_processor - process_pdf_files - Found 2 PDF files to process
+2025-03-18 17:44:28 - INFO - pdf_processor - process_pdf_files - Successfully processed 2 PDF files
+2025-03-18 17:44:28 - WARNING - main - main - Found 2 unsupported files in data
+2025-03-18 17:44:28 - WARNING - main - main - Unsupported file: .DS_Store ()
+2025-03-18 17:44:28 - WARNING - main - main - Unsupported file: mbox ()
+2025-03-18 17:44:28 - WARNING - main - main - To add support for these file types, implement appropriate handlers in the application.
+2025-03-18 17:44:28 - INFO - utils - display_statistics - ==================================================
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Processing Statistics:
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Total processing time: 0.02 seconds
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Processed emails: 0
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Processed email files: 0
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Processed PDF files: 2
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Unsupported files: 2
+2025-03-18 17:44:28 - INFO - utils - display_statistics - Unsupported file types:
+2025-03-18 17:44:28 - INFO - utils - display_statistics -   no extension: 2 file(s)
+2025-03-18 17:44:28 - INFO - utils - display_statistics - ==================================================
+2025-03-18 17:44:29 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
+2025-03-18 17:44:29 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
+2025-03-20 16:15:20 - INFO - main - main - Shutting down UI server...
