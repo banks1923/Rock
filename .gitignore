@@ -1,1 +1,5 @@
 mbox.mbox
+*.mbox
+*.mbox.mbox
+mbox.mbox
+*.venv
