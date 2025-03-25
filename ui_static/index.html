@@ -61,6 +61,21 @@
             padding: 10px;
             margin: 15px 0;
         }
+        .search-container {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #333;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .search-form input, .search-form select, .search-form button {
+            padding: 8px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -79,6 +94,21 @@
                 <li><strong>Documents:</strong> .pdf files</li>
             </ul>
             <p>You can specify a different input directory with the <code>--directory</code> or <code>-d</code> command-line option.</p>
+        </div>
+        
+        <div class="search-container">
+            <h3>Search Emails</h3>
+            <div class="search-form">
+                <input type="text" id="search-keyword" placeholder="Enter search keyword...">
+                <select id="search-field">
+                    <option value="all">All Fields</option>
+                    <option value="subject">Subject</option>
+                    <option value="content">Content</option>
+                    <option value="sender">Sender</option>
+                </select>
+                <button onclick="searchEmails()">Search</button>
+            </div>
+            <div id="search-results"></div>
         </div>
         
         <div class="card">
@@ -196,6 +226,14 @@
         
         // Refresh every 5 seconds
         setInterval(fetchMetrics, 5000);
+        
+        // Search emails
+        function searchEmails() {
+            const keyword = document.getElementById('search-keyword').value;
+            const field = document.getElementById('search-field').value;
+            // Implement search logic here
+            console.log(`Searching for "${keyword}" in field "${field}"`);
+        }
     </script>
 </body>
 </html>

@@ -30,10 +30,12 @@ MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
 # Input directory settings - this is where you place files for processing
 MBOX_DIRECTORY = "data"  # Default directory for all input files (emails, images, PDFs)
+
+# Define supported file extensions for different types
 SUPPORTED_EXTENSIONS = {
-    'emails': ['.mbox', '.eml'],
-    'images': ['.jpg', '.jpeg', '.png'],
-    'documents': ['.pdf']  # Added PDF support
+    'email': ['.mbox', '.MBOX', '.eml', '.EML', ''],  # Empty string allows for files named 'mbox' without extension
+    'image': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'],
+    'document': ['.pdf', '.PDF']
 }
 
 KEYWORDS = ["urgent", "legal", "contract"]

@@ -641,6 +641,20 @@ def start_ui_server(metrics, logger, db_path=None):
     Returns:
         tuple: (server, server_thread)
     """
+    from flask import Flask, render_template, jsonify, request
+    import threading
+    import webbrowser
+    import socket
+    
+    # Create the Flask app
+    app = Flask(__name__, 
+                template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
+                static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+    
+    # Fix for NameError: Make app available to other functions
+    global flask_app
+    flask_app = app
+    
     # Check for both "ui_static" and "UI Static" directories
     ui_dir = Path(__file__).parent / 'ui_static'
     alt_ui_dir = Path(__file__).parent / 'UI Static'
@@ -802,7 +816,60 @@ def start_ui_server(metrics, logger, db_path=None):
         except Exception as e:
             logger.error(f"Search error: {e}")
             return jsonify({"error": str(e)}), 500
-    
+
+    @app.route('/api/search', methods=['GET', 'POST'])
+    def search_database():
+        """API endpoint to search the database for emails"""
+        try:
+            # Get search parameters
+            if request.method == 'POST':
+                data = request.json
+                keyword = data.get('keyword', '')
+                field = data.get('field', 'all')  # 'subject', 'content', 'sender', 'all'
+                limit = int(data.get('limit', 100))
+            else:  # GET method
+                keyword = request.args.get('keyword', '')
+                field = request.args.get('field', 'all')
+                limit = int(request.args.get('limit', 100))
+            
+            # Connect to database
+            conn = sqlite3.connect(config.DATABASE_FILE)
+            conn.row_factory = sqlite3.Row  # Return rows as dictionaries
+            cursor = conn.cursor()
+            
+            # Build the query based on which field to search
+            if field == 'subject':
+                query = "SELECT * FROM emails WHERE subject LIKE ? LIMIT ?"
+                params = (f'%{keyword}%', limit)
+            elif field == 'content':
+                query = "SELECT * FROM emails WHERE content LIKE ? LIMIT ?"
+                params = (f'%{keyword}%', limit)
+            elif field == 'sender':
+                query = "SELECT * FROM emails WHERE sender LIKE ? LIMIT ?"
+                params = (f'%{keyword}%', limit)
+            else:  # 'all' - search all fields
+                query = "SELECT * FROM emails WHERE subject LIKE ? OR content LIKE ? OR sender LIKE ? LIMIT ?"
+                params = (f'%{keyword}%', f'%{keyword}%', f'%{keyword}%', limit)
+            
+            # Execute search
+            cursor.execute(query, params)
+            results = [dict(row) for row in cursor.fetchall()]
+            
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'count': len(results),
+                'results': results
+            })
+            
+        except Exception as e:
+            logger.exception(f"Search error: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
+
     return server, server_thread
 
 def open_ui_in_browser(logger):

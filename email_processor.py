@@ -3,11 +3,13 @@ import logging
 import mailbox
 import time
 import sys
+import glob  # Add missing import for glob
 from typing import List, Dict, Optional, Any, Iterator, Generator
 from pathlib import Path
 
 # Make sure thread_utils can be found
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
 
 # Try different import approaches to handle potential issues
 try:
@@ -89,15 +91,41 @@ def process_mbox_files(directory: str, logger=None, dry_run: bool = False,
         metrics["error"] = f"Directory not found: {directory}"
         return 1
         
-    # Look for both .mbox and .MBOX files (case-insensitive)
-    mbox_files = list(dir_path.glob('*.mbox')) + list(dir_path.glob('*.MBOX'))
+    # Find all .mbox files (with extension)
+    mbox_pattern = os.path.join(directory, "*.mbox")
+    mbox_files = glob.glob(mbox_pattern, recursive=False)
+    
+    # Also add any files literally named "mbox" (without extension)
+    exact_mbox_path = os.path.join(directory, "mbox")
+    if os.path.isfile(exact_mbox_path):
+        logger.info(f"Found 'mbox' file without extension: {exact_mbox_path}")
+        mbox_files.append(exact_mbox_path)
+    
+    # Case insensitive search
+    mbox_pattern_upper = os.path.join(directory, "*.MBOX")
+    mbox_files.extend(glob.glob(mbox_pattern_upper, recursive=False))
+    
+    # MBOX detection by content inspection for files without .mbox extension
+    for file_path in glob.glob(os.path.join(directory, "*")):
+        if os.path.isfile(file_path) and file_path not in mbox_files:
+            try:
+                # Check first 100 bytes for MBOX format identifier "From "
+                with open(file_path, 'rb') as f:
+                    header = f.read(100).decode('utf-8', errors='ignore')
+                    if header.startswith('From '):
+                        logger.info(f"Detected MBOX format file without .mbox extension: {file_path}")
+                        mbox_files.append(file_path)
+            except Exception as e:
+                logger.debug(f"Failed to inspect file {file_path}: {e}")
     
     if not mbox_files:
         logger.warning(f"No .mbox files found in directory: {directory}")
         metrics["warning"] = "No .mbox files found"
         return 0
-        
-    logger.info(f"Found {len(mbox_files)} .mbox files to process: {[f.name for f in mbox_files]}")
+    
+    # Extract filenames properly - always use basename to avoid attribute errors
+    file_names = [os.path.basename(str(f)) for f in mbox_files]
+    logger.info(f"Found {len(mbox_files)} .mbox files to process: {file_names}")
     
     # Initialize thread identifier if threading is enabled
     thread_identifier = ThreadIdentifier() if use_threading else None

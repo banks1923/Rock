@@ -677,3 +677,295 @@ NameError: name 'app' is not defined
 2025-03-18 17:44:29 - INFO - ui_manager - open_ui_in_browser - Opened UI in browser: http://127.0.0.1:8080
 2025-03-18 17:44:29 - INFO - main - main - UI server is running. Press Ctrl+C to exit.
 2025-03-20 16:15:20 - INFO - main - main - Shutting down UI server...
+2025-03-24 18:46:32 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-24 18:46:32 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-24 18:46:32 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-24 18:46:32 - INFO - Input directory: data
+2025-03-24 18:46:32 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 18:46:32 - INFO - Database schema created successfully
+2025-03-24 18:46:32 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-24 18:46:32 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-24 18:46:32 - ERROR - Failed to start UI server: name 'app' is not defined
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 164, in main
+    server, _ = start_ui_server(metrics, logger, str(db_path))
+                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/ui_manager.py", line 666, in start_ui_server
+    @app.route('/api/query', methods=['POST'])
+     ^^^
+NameError: name 'app' is not defined
+2025-03-24 18:46:32 - INFO - Confirmed write access to data directory: data
+2025-03-24 18:46:32 - INFO - Starting email processing...
+2025-03-24 18:46:32 - INFO - Looking for .mbox files in: data
+2025-03-24 18:46:32 - INFO - Directory contains 6 total files
+2025-03-24 18:46:32 - WARNING - No .mbox files found in directory: data (absolute path: /Users/Shared/stonev2.03/data)
+2025-03-24 18:46:32 - INFO - Directory content sample (up to 10 files): ['Re- Notice to Enter Dwelling Unit.pdf', '.DS_Store', 'Missing from the Timeline..pdf', 'mbox', 'processed_documents', 'README.txt']
+2025-03-24 18:46:32 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-24 18:46:32 - WARNING - No .mbox files found in directory: data
+2025-03-24 18:46:32 - INFO - Starting image processing...
+2025-03-24 18:46:32 - INFO - No image files found in data
+2025-03-24 18:46:32 - INFO - Starting PDF processing...
+2025-03-24 18:46:32 - INFO - Found 2 PDF files to process
+2025-03-24 18:46:32 - INFO - Successfully processed 2 PDF files
+2025-03-24 18:46:32 - WARNING - Found 2 unsupported files in data
+2025-03-24 18:46:32 - WARNING - Unsupported file: .DS_Store ()
+2025-03-24 18:46:32 - WARNING - Unsupported file: mbox ()
+2025-03-24 18:46:32 - INFO - ==================================================
+2025-03-24 18:46:32 - INFO - PROCESSING SUMMARY
+2025-03-24 18:46:32 - INFO - ==================================================
+2025-03-24 18:46:32 - INFO - Total time: 0.02 seconds
+2025-03-24 18:46:32 - INFO - Files processed: 0
+2025-03-24 18:46:32 - INFO - Emails processed: 0
+2025-03-24 18:46:32 - WARNING - Warning: No .mbox files found
+2025-03-24 18:46:32 - INFO - --------------------------------------------------
+2025-03-24 18:46:32 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-24 18:46:32 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-24 18:46:32 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 0, 'total_threads': 0, 'db_size_kb': 36}
+2025-03-24 18:46:32 - WARNING - Database contains no emails. UI may not display any data.
+2025-03-24 18:46:32 - INFO - Attempting to open UI in browser...
+2025-03-24 18:46:32 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-24 18:46:32 - INFO - UI successfully opened in browser
+2025-03-24 18:46:32 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-24 19:06:36 - INFO - Shutting down UI server...
+2025-03-24 19:06:38 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-24 19:06:38 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-24 19:06:38 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:06:38 - INFO - Input directory: data
+2025-03-24 19:06:38 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:06:38 - INFO - Database schema created successfully
+2025-03-24 19:06:38 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:06:38 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-24 19:06:38 - INFO - Confirmed write access to data directory: data
+2025-03-24 19:06:38 - INFO - Starting email processing...
+2025-03-24 19:06:38 - INFO - Looking for .mbox files in: data
+2025-03-24 19:06:38 - INFO - Directory contains 6 total files
+2025-03-24 19:06:38 - WARNING - No .mbox files found in directory: data (absolute path: /Users/Shared/stonev2.03/data)
+2025-03-24 19:06:38 - INFO - Directory content sample (up to 10 files): ['Re- Notice to Enter Dwelling Unit.pdf', '.DS_Store', 'Missing from the Timeline..pdf', 'mbox', 'processed_documents', 'README.txt']
+2025-03-24 19:06:38 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-24 19:06:38 - INFO - Found 'mbox' file without extension: data/mbox
+2025-03-24 19:06:38 - ERROR - Exception during email processing: 'str' object has no attribute 'name'
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 228, in main
+    email_exit_code = process_mbox_files(
+        str(input_dir),  # Convert Path to string for compatibility
+    ...<2 lines>...
+        metrics=metrics
+    )
+  File "/Users/Shared/stonev2.03/email_processor.py", line 126, in process_mbox_files
+    logger.info(f"Found {len(mbox_files)} .mbox files to process: {[f.name for f in mbox_files]}")
+                                                                    ^^^^^^
+AttributeError: 'str' object has no attribute 'name'
+2025-03-24 19:06:38 - INFO - Starting image processing...
+2025-03-24 19:06:38 - INFO - No image files found in data
+2025-03-24 19:06:38 - INFO - Starting PDF processing...
+2025-03-24 19:06:38 - INFO - Found 2 PDF files to process
+2025-03-24 19:06:38 - INFO - Successfully processed 2 PDF files
+2025-03-24 19:06:38 - INFO - ==================================================
+2025-03-24 19:06:38 - INFO - PROCESSING SUMMARY
+2025-03-24 19:06:38 - INFO - ==================================================
+2025-03-24 19:06:38 - INFO - Total time: 0.02 seconds
+2025-03-24 19:06:38 - INFO - Files processed: 0
+2025-03-24 19:06:38 - INFO - Emails processed: 0
+2025-03-24 19:06:38 - WARNING - Warning: No .mbox files found in input directory
+2025-03-24 19:06:38 - INFO - --------------------------------------------------
+2025-03-24 19:06:38 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-24 19:06:38 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-24 19:06:38 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 0, 'total_threads': 0, 'db_size_kb': 36}
+2025-03-24 19:06:38 - WARNING - Database contains no emails. UI may not display any data.
+2025-03-24 19:06:38 - INFO - Attempting to open UI in browser...
+2025-03-24 19:06:38 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-24 19:06:38 - INFO - UI successfully opened in browser
+2025-03-24 19:06:38 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-24 19:12:02 - INFO - Shutting down UI server...
+2025-03-24 19:12:06 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-24 19:12:06 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-24 19:12:06 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:12:06 - INFO - Input directory: data
+2025-03-24 19:12:06 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:12:06 - INFO - Database schema created successfully
+2025-03-24 19:12:06 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:12:06 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-24 19:12:06 - INFO - Confirmed write access to data directory: data
+2025-03-24 19:12:06 - INFO - Starting email processing...
+2025-03-24 19:12:06 - INFO - Looking for .mbox files in: data
+2025-03-24 19:12:06 - INFO - Directory contains 6 total files
+2025-03-24 19:12:06 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 19:12:06 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-24 19:12:06 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 19:12:06 - INFO - Processing file: data/mbox.mbox
+2025-03-24 19:12:09 - INFO - Processing mbox file in batches: data/mbox.mbox
+2025-03-24 19:12:12 - INFO - Found 321 messages in data/mbox.mbox
+2025-03-24 19:12:17 - INFO - Processed 321/321 emails (100.0%)
+2025-03-24 19:12:17 - INFO - Inserting 321 email records into database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 19:12:18 - INFO - Database insertion completed: 321 rows in 0.01s (35166.2 rows/sec)
+2025-03-24 19:12:18 - INFO - Inserted 321 emails from batch
+2025-03-24 19:12:18 - INFO - Closed mbox file: data/mbox.mbox
+2025-03-24 19:12:18 - INFO - Completed processing data/mbox.mbox: 321 of 321 emails processed
+2025-03-24 19:12:18 - INFO - Starting image processing...
+2025-03-24 19:12:18 - INFO - No image files found in data
+2025-03-24 19:12:18 - INFO - Starting PDF processing...
+2025-03-24 19:12:18 - INFO - Found 2 PDF files to process
+2025-03-24 19:12:18 - INFO - Successfully processed 2 PDF files
+2025-03-24 19:12:18 - INFO - ==================================================
+2025-03-24 19:12:18 - INFO - PROCESSING SUMMARY
+2025-03-24 19:12:18 - INFO - ==================================================
+2025-03-24 19:12:18 - INFO - Total time: 11.27 seconds
+2025-03-24 19:12:18 - INFO - Files processed: 1
+2025-03-24 19:12:18 - INFO - Emails processed: 321
+2025-03-24 19:12:18 - INFO - --------------------------------------------------
+2025-03-24 19:12:18 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-24 19:12:18 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-24 19:12:18 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 314, 'total_threads': 191, 'db_size_kb': 1776}
+2025-03-24 19:12:18 - INFO - Attempting to open UI in browser...
+2025-03-24 19:12:18 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-24 19:12:18 - INFO - UI successfully opened in browser
+2025-03-24 19:12:18 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-24 20:29:37 - INFO - Shutting down UI server...
+2025-03-24 20:50:22 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-24 20:50:22 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-24 20:50:22 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-24 20:50:22 - INFO - Input directory: data
+2025-03-24 20:50:22 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 20:50:22 - INFO - Database schema created successfully
+2025-03-24 20:50:22 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-24 20:50:22 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-24 20:50:22 - INFO - Confirmed write access to data directory: data
+2025-03-24 20:50:22 - INFO - Starting email processing...
+2025-03-24 20:50:22 - INFO - Looking for .mbox files in: data
+2025-03-24 20:50:22 - INFO - Directory contains 6 total files
+2025-03-24 20:50:22 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 20:50:22 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-24 20:50:22 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 20:50:22 - INFO - Processing file: data/mbox.mbox
+2025-03-24 20:50:24 - INFO - Processing mbox file in batches: data/mbox.mbox
+2025-03-24 20:50:27 - INFO - Found 321 messages in data/mbox.mbox
+2025-03-24 20:50:33 - INFO - Processed 321/321 emails (100.0%)
+2025-03-24 20:50:33 - INFO - Inserting 321 email records into database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 20:50:33 - INFO - Database insertion completed: 321 rows in 0.02s (17706.3 rows/sec)
+2025-03-24 20:50:33 - INFO - Inserted 321 emails from batch
+2025-03-24 20:50:33 - INFO - Closed mbox file: data/mbox.mbox
+2025-03-24 20:50:33 - INFO - Completed processing data/mbox.mbox: 321 of 321 emails processed
+2025-03-24 20:50:33 - INFO - Starting image processing...
+2025-03-24 20:50:33 - INFO - No image files found in data
+2025-03-24 20:50:33 - INFO - Starting PDF processing...
+2025-03-24 20:50:33 - INFO - Found 2 PDF files to process
+2025-03-24 20:50:33 - INFO - Successfully processed 2 PDF files
+2025-03-24 20:50:33 - INFO - ==================================================
+2025-03-24 20:50:33 - INFO - PROCESSING SUMMARY
+2025-03-24 20:50:33 - INFO - ==================================================
+2025-03-24 20:50:33 - INFO - Total time: 11.15 seconds
+2025-03-24 20:50:33 - INFO - Files processed: 1
+2025-03-24 20:50:33 - INFO - Emails processed: 321
+2025-03-24 20:50:33 - INFO - --------------------------------------------------
+2025-03-24 20:50:33 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-24 20:50:33 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-24 20:50:33 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 314, 'total_threads': 191, 'db_size_kb': 1812}
+2025-03-24 20:50:33 - INFO - Attempting to open UI in browser...
+2025-03-24 20:50:33 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-24 20:50:33 - INFO - UI successfully opened in browser
+2025-03-24 20:50:33 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-24 21:04:38 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-24 21:04:38 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-24 21:04:38 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:04:38 - INFO - Input directory: data
+2025-03-24 21:04:38 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:04:38 - INFO - Database schema created successfully
+2025-03-24 21:04:38 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:04:38 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-24 21:04:38 - INFO - Confirmed write access to data directory: data
+2025-03-24 21:04:38 - INFO - Starting email processing...
+2025-03-24 21:04:38 - INFO - Looking for .mbox files in: data
+2025-03-24 21:04:38 - INFO - Directory contains 6 total files
+2025-03-24 21:04:38 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 21:04:38 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-24 21:04:38 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 21:04:38 - INFO - Processing file: data/mbox.mbox
+2025-03-24 21:04:41 - INFO - Processing mbox file in batches: data/mbox.mbox
+2025-03-24 21:04:44 - INFO - Found 321 messages in data/mbox.mbox
+2025-03-24 21:04:49 - INFO - Processed 321/321 emails (100.0%)
+2025-03-24 21:04:49 - INFO - Inserting 321 email records into database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:04:49 - INFO - Database insertion completed: 321 rows in 0.02s (17645.1 rows/sec)
+2025-03-24 21:04:49 - INFO - Inserted 321 emails from batch
+2025-03-24 21:04:49 - INFO - Closed mbox file: data/mbox.mbox
+2025-03-24 21:04:49 - INFO - Completed processing data/mbox.mbox: 321 of 321 emails processed
+2025-03-24 21:04:49 - INFO - Starting image processing...
+2025-03-24 21:04:49 - INFO - No image files found in data
+2025-03-24 21:04:49 - INFO - Starting PDF processing...
+2025-03-24 21:04:49 - INFO - Found 2 PDF files to process
+2025-03-24 21:04:49 - INFO - Successfully processed 2 PDF files
+2025-03-24 21:04:49 - INFO - ==================================================
+2025-03-24 21:04:49 - INFO - PROCESSING SUMMARY
+2025-03-24 21:04:49 - INFO - ==================================================
+2025-03-24 21:04:49 - INFO - Total time: 11.44 seconds
+2025-03-24 21:04:49 - INFO - Files processed: 1
+2025-03-24 21:04:49 - INFO - Emails processed: 321
+2025-03-24 21:04:49 - INFO - --------------------------------------------------
+2025-03-24 21:04:49 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-24 21:04:49 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-24 21:04:49 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 314, 'total_threads': 191, 'db_size_kb': 1816}
+2025-03-24 21:04:49 - INFO - Attempting to open UI in browser...
+2025-03-24 21:04:49 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-24 21:04:49 - INFO - UI successfully opened in browser
+2025-03-24 21:04:49 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-24 21:18:04 - INFO - Shutting down UI server...
+2025-03-24 21:18:07 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-24 21:18:07 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-24 21:18:07 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:18:07 - INFO - Input directory: data
+2025-03-24 21:18:07 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:18:07 - INFO - Database schema created successfully
+2025-03-24 21:18:07 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:18:07 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-24 21:18:07 - ERROR - Failed to start UI server: View function mapping is overwriting an existing endpoint function: search_database
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 164, in main
+    server, _ = start_ui_server(metrics, logger, str(db_path))
+                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/ui_manager.py", line 820, in start_ui_server
+    @app.route('/api/search', methods=['GET', 'POST'])
+     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/.venv/lib/python3.13/site-packages/flask/sansio/scaffold.py", line 362, in decorator
+    self.add_url_rule(rule, endpoint, f, **options)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/.venv/lib/python3.13/site-packages/flask/sansio/scaffold.py", line 47, in wrapper_func
+    return f(self, *args, **kwargs)
+  File "/Users/Shared/stonev2.03/.venv/lib/python3.13/site-packages/flask/sansio/app.py", line 657, in add_url_rule
+    raise AssertionError(
+    ...<2 lines>...
+    )
+AssertionError: View function mapping is overwriting an existing endpoint function: search_database
+2025-03-24 21:18:07 - INFO - Confirmed write access to data directory: data
+2025-03-24 21:18:07 - INFO - Starting email processing...
+2025-03-24 21:18:07 - INFO - Looking for .mbox files in: data
+2025-03-24 21:18:07 - INFO - Directory contains 6 total files
+2025-03-24 21:18:07 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 21:18:07 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-24 21:18:07 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-24 21:18:07 - INFO - Processing file: data/mbox.mbox
+2025-03-24 21:18:10 - INFO - Processing mbox file in batches: data/mbox.mbox
+2025-03-24 21:18:13 - INFO - Found 321 messages in data/mbox.mbox
+2025-03-24 21:18:18 - INFO - Processed 321/321 emails (100.0%)
+2025-03-24 21:18:18 - INFO - Inserting 321 email records into database: /Users/Shared/stonev2.03/emails.db
+2025-03-24 21:18:18 - INFO - Database insertion completed: 321 rows in 0.02s (17520.8 rows/sec)
+2025-03-24 21:18:18 - INFO - Inserted 321 emails from batch
+2025-03-24 21:18:18 - INFO - Closed mbox file: data/mbox.mbox
+2025-03-24 21:18:18 - INFO - Completed processing data/mbox.mbox: 321 of 321 emails processed
+2025-03-24 21:18:18 - INFO - Starting image processing...
+2025-03-24 21:18:18 - INFO - No image files found in data
+2025-03-24 21:18:18 - INFO - Starting PDF processing...
+2025-03-24 21:18:18 - INFO - Found 2 PDF files to process
+2025-03-24 21:18:18 - INFO - Successfully processed 2 PDF files
+2025-03-24 21:18:18 - INFO - ==================================================
+2025-03-24 21:18:18 - INFO - PROCESSING SUMMARY
+2025-03-24 21:18:18 - INFO - ==================================================
+2025-03-24 21:18:18 - INFO - Total time: 11.35 seconds
+2025-03-24 21:18:18 - INFO - Files processed: 1
+2025-03-24 21:18:18 - INFO - Emails processed: 321
+2025-03-24 21:18:18 - INFO - --------------------------------------------------
+2025-03-24 21:18:18 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-24 21:18:18 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-24 21:18:18 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 314, 'total_threads': 191, 'db_size_kb': 1816}
+2025-03-24 21:18:18 - INFO - Attempting to open UI in browser...
+2025-03-24 21:18:19 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-24 21:18:19 - INFO - UI successfully opened in browser
+2025-03-24 21:18:19 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.

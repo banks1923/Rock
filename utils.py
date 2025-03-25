@@ -14,6 +14,21 @@ def setup_logging() -> logging.Logger:
     """
     Sets up logging with both file and console handlers.
     """
+    # Emergency debugging - write directly to a known file before any setup
+    with open("/tmp/stone_debug.log", "w") as f:
+        f.write(f"Startup diagnostic at {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Python version: {sys.version}\n")
+        f.write(f"sys.stdout type: {type(sys.stdout)}\n")
+        f.write(f"sys.stderr type: {type(sys.stderr)}\n")
+    
+    # Print directly to ensure we have basic console output
+    print("Initializing logging system...")
+    print(f"sys.stdout appears to be: {type(sys.stdout)}")
+    
+    # Save original stdout/stderr
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+    
     # Use root logger for application-wide logging
     logger = logging.getLogger()
     
@@ -29,21 +44,43 @@ def setup_logging() -> logging.Logger:
     log_level = getattr(logging, config.LOG_LEVEL, logging.INFO)
     logger.setLevel(log_level)
 
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    simple_formatter = logging.Formatter('%(message)s')  # Simpler format for console
 
     try:
         file_handler = logging.FileHandler(config.LOG_FILE)
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+        print(f"Log file: {config.LOG_FILE}")  # Direct console output
     except Exception as e:
         print(f"Warning: Could not set up file logging: {e}")
         # Continue without file logging
 
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(log_level)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    # Use sys.stderr for critical/error/warning and sys.stdout for info/debug
+    error_console = logging.StreamHandler(sys.stderr)
+    error_console.setLevel(logging.WARNING)  # WARNING and above go to stderr
+    error_console.setFormatter(formatter)
+    logger.addHandler(error_console)
+
+    info_console = logging.StreamHandler(sys.stdout)
+    info_console.setLevel(logging.INFO)  # INFO and DEBUG go to stdout
+    info_console.setFormatter(simple_formatter)
+    info_console.addFilter(lambda record: record.levelno < logging.WARNING)  # Only handle INFO and DEBUG
+    logger.addHandler(info_console)
+
+    # Ensure we get some direct console output regardless of logging
+    try:
+        print(f"Direct print test: Starting Stone Email Processor v{config.VERSION}")
+        original_stdout.write(f"Direct stdout write test: Log level: {config.LOG_LEVEL}\n")
+        original_stdout.flush()
+    except Exception as e:
+        # If direct print fails, try writing to our emergency log
+        with open("/tmp/stone_debug.log", "a") as f:
+            f.write(f"Error during direct console output: {e}\n")
+    
+    print(f"Starting Stone Email Processor v{config.VERSION}")
+    print(f"Log level: {config.LOG_LEVEL}")
 
     # Set module loggers to use the root logger's level
     logging.getLogger('email_processor').setLevel(log_level)
@@ -145,42 +182,72 @@ def save_file_cache(cache_data):
         logger.error(f"Error saving cache: {e}")
         return False
 
-def display_statistics(logger, metrics):
-    """Display processing statistics."""
-    elapsed_time = time.time() - metrics["start_time"]
+def display_statistics(logger, metrics, detailed=False):
+    """
+    Display processing statistics in a consistent format.
+    
+    Args:
+        logger: Logger instance
+        metrics: Dictionary containing metrics about the processing
+        detailed: Whether to show detailed statistics (defaults to False to prefer UI)
+    """
+    elapsed_time = time.time() - metrics.get("start_time", time.time())
+    processed_files = metrics.get("processed_files", 0)
+    processed_emails = metrics.get("processed_emails", 0)
+    
+    # Direct console output for critical information
+    print("\n" + "=" * 50)
+    print("PROCESSING SUMMARY")
+    print("=" * 50)
+    print(f"Total time: {elapsed_time:.2f} seconds")
+    print(f"Files processed: {processed_files}")
+    print(f"Emails processed: {processed_emails}")
+    
+    # Basic summary that's always shown
     logger.info("=" * 50)
-    logger.info("Processing Statistics:")
-    logger.info(f"Total processing time: {elapsed_time:.2f} seconds")
-    
-    if "processed_emails" in metrics:
-        logger.info(f"Processed emails: {metrics.get('processed_emails', 0)}")
-    
-    if "processed_files" in metrics:
-        logger.info(f"Processed email files: {metrics.get('processed_files', 0)}")
-    
-    if "processed_images" in metrics:
-        logger.info(f"Processed images: {metrics.get('processed_images', 0)}")
-        
-    if "processed_pdfs" in metrics:
-        logger.info(f"Processed PDF files: {metrics.get('processed_pdfs', 0)}")
-    
-    if "unsupported_files" in metrics and metrics["unsupported_files"]:
-        logger.info(f"Unsupported files: {len(metrics['unsupported_files'])}")
-        
-        # Group unsupported files by extension
-        ext_counts = {}
-        for file_info in metrics["unsupported_files"]:
-            ext = file_info["extension"] or "no extension"
-            if ext not in ext_counts:
-                ext_counts[ext] = 0
-            ext_counts[ext] += 1
-        
-        # Display extension counts
-        logger.info("Unsupported file types:")
-        for ext, count in sorted(ext_counts.items(), key=lambda x: x[1], reverse=True):
-            logger.info(f"  {ext}: {count} file(s)")
-    
+    logger.info("PROCESSING SUMMARY")
     logger.info("=" * 50)
+    logger.info(f"Total time: {elapsed_time:.2f} seconds")
+    logger.info(f"Files processed: {processed_files}")
+    logger.info(f"Emails processed: {processed_emails}")
+    
+    # Show warnings if any
+    if "warning" in metrics:
+        warning_msg = f"Warning: {metrics['warning']}"
+        print(f"\n⚠️ {warning_msg}")
+        logger.warning(warning_msg)
+    
+    # If mbox files were found but no emails processed, highlight this issue
+    if metrics.get("mbox_files_found", 0) > 0 and processed_emails == 0:
+        issue_msg = "IMPORTANT: MBOX files were found but no emails were processed. Check logs for errors."
+        print(f"\n❌ {issue_msg}")
+        logger.warning(issue_msg)
+    
+    # Show minimal UI access information
+    ui_msg = f"For detailed statistics and visualization, visit the UI at: http://localhost:{config.UI_PORT}"
+    print("\n" + "-" * 50)
+    print(ui_msg)
+    print("Press Ctrl+C to exit the server when done.")
+    logger.info("-" * 50)
+    logger.info(ui_msg)
+    logger.info("Press Ctrl+C to exit the server when done.")
+    
+    # Only show detailed stats if specifically requested
+    if detailed:
+        print("\nDETAILED STATISTICS:")
+        logger.info("-" * 50)
+        logger.info("DETAILED STATISTICS:")
+        
+        # List all metrics except internal ones
+        for key, value in sorted(metrics.items()):
+            if key not in ["start_time", "warning", "unsupported_files"]:
+                print(f"  {key}: {value}")
+                logger.info(f"  {key}: {value}")
+        
+        # Show unsupported file count if available
+        if "unsupported_files" in metrics and metrics["unsupported_files"]:
+            print(f"  Unsupported files: {len(metrics['unsupported_files'])}")
+            logger.info(f"  Unsupported files: {len(metrics['unsupported_files'])}")
 
 def ensure_data_directory(directory_path: Path) -> None:
     """

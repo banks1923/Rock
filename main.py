@@ -1,20 +1,58 @@
+#!/usr/bin/env python3
+"""
+Stone Email Processor main application
+"""
 import sys
-import logging
+import os
 import time
-import os  # Added missing import for os module
-from pathlib import Path
-import config
-from database import create_database
-from email_processor import process_mbox_files
-from image_processor import process_image_files
-from pdf_processor import process_pdf_files
-from ui_manager import start_ui_server, open_ui_in_browser
-from argparse import ArgumentParser
-from utils import (
-    setup_logging, backup_database,
-    load_file_cache, save_file_cache, display_statistics,
-    ensure_data_directory, identify_unsupported_files
-)
+import traceback
+
+# Super early debugging - before any imports
+with open("/tmp/stone_init.log", "w") as f:
+    f.write(f"Starting application at {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+    f.write(f"Python version: {sys.version}\n")
+    f.write(f"Working directory: {os.getcwd()}\n")
+
+print("Starting Stone Email Processor...")
+print(f"Current directory: {os.getcwd()}")
+
+# Import core modules with verbose error handling
+try:
+    import logging
+    from pathlib import Path
+    print("Successfully imported basic modules")
+except Exception as e:
+    error_msg = f"ERROR importing basic modules: {str(e)}"
+    print(error_msg)
+    with open("/tmp/stone_init_error.log", "w") as f:
+        f.write(error_msg + "\n")
+        f.write(traceback.format_exc())
+    sys.exit(1)
+
+# Import application modules with verbose error handling
+try:
+    print("Importing application modules...")
+    import config
+    print(f"Config loaded. Version: {config.VERSION}")
+    from database import create_database
+    from email_processor import process_mbox_files
+    from image_processor import process_image_files
+    from pdf_processor import process_pdf_files
+    from ui_manager import start_ui_server, open_ui_in_browser
+    from argparse import ArgumentParser
+    from utils import (
+        setup_logging, backup_database,
+        load_file_cache, save_file_cache, display_statistics,
+        ensure_data_directory, identify_unsupported_files
+    )
+    print("All application modules imported successfully")
+except Exception as e:
+    error_msg = f"ERROR importing application modules: {str(e)}"
+    print(error_msg)
+    with open("/tmp/stone_init_error.log", "w") as f:
+        f.write(error_msg + "\n")
+        f.write(traceback.format_exc())
+    sys.exit(1)
 
 def parse_args():
     """
@@ -44,6 +82,9 @@ def main() -> int:
     Returns:
         int: 0 on success, non-zero on error
     """
+    # Direct console output for immediate feedback
+    print(f"Stone Email Processor v{config.VERSION} starting...")
+    
     start_time = time.time()
     
     try:
@@ -160,26 +201,42 @@ def main() -> int:
     try:
         # Process email files
         if not args.skip_emails:
+            print(f"Looking for .mbox files in: {input_dir}")
             logger.info("Starting email processing...")
             logger.info(f"Looking for .mbox files in: {input_dir}")
             
-            # Count mbox files before processing
+            # Enhanced MBOX file detection with more diagnostic info
             mbox_files = list(input_dir.glob('*.mbox')) + list(input_dir.glob('*.MBOX'))
+            all_files = list(input_dir.iterdir())
+            logger.info(f"Directory contains {len(all_files)} total files")
+            
             if not mbox_files:
-                logger.warning(f"No .mbox files found in directory: {input_dir}")
+                # Direct console warning
+                print(f"⚠️ Warning: No .mbox files found in {input_dir}")
+                
+                # Log more detailed information to help diagnose why no MBOX files are found
+                logger.warning(f"No .mbox files found in directory: {input_dir} (absolute path: {input_dir.absolute()})")
+                logger.info(f"Directory content sample (up to 10 files): {[f.name for f in all_files[:10]]}")
                 metrics["warning"] = "No .mbox files found in input directory"
             else:
-                logger.info(f"Found {len(mbox_files)} .mbox files to process")
+                found_msg = f"Found {len(mbox_files)} .mbox files to process"
+                print(found_msg)
+                logger.info(f"{found_msg}: {[f.name for f in mbox_files]}")
                 metrics["mbox_files_found"] = len(mbox_files)
             
-            email_exit_code = process_mbox_files(
-                str(input_dir),  # Convert Path to string for compatibility
-                logger,
-                batch_size=args.batch_size,
-                metrics=metrics
-            )
-            if email_exit_code != 0:
-                exit_code = email_exit_code
+            try:
+                email_exit_code = process_mbox_files(
+                    str(input_dir),  # Convert Path to string for compatibility
+                    logger,
+                    batch_size=args.batch_size,
+                    metrics=metrics
+                )
+                if email_exit_code != 0:
+                    logger.error(f"Email processing failed with exit code: {email_exit_code}")
+                    exit_code = email_exit_code
+            except Exception as e:
+                logger.exception(f"Exception during email processing: {e}")
+                exit_code = 1
         
         # Process image files
         if not args.skip_images and config.IMAGE_PROCESSING_ENABLED:
@@ -215,12 +272,32 @@ def main() -> int:
             if len(unsupported_files) > 10:
                 logger.warning(f"... and {len(unsupported_files) - 10} more unsupported files")
         
-        display_statistics(logger, metrics)
+        # Use detailed=False to prefer UI for detailed statistics
+        display_statistics(logger, metrics, detailed=False)
+        
+        # Check database stats before opening UI
+        try:
+            from database_query import get_database_stats
+            db_stats = get_database_stats(logger)
+            logger.info(f"Database statistics: {db_stats}")
+            if db_stats.get('total_emails', 0) == 0:
+                logger.warning("Database contains no emails. UI may not display any data.")
+        except Exception as e:
+            logger.warning(f"Failed to get database statistics: {e}")
         
         if not args.no_ui:
-            # Launch UI in browser automatically, every time
-            open_ui_in_browser(logger)
-            logger.info("UI server is running. Press Ctrl+C to exit.")
+            # Enhanced UI opening with better error handling
+            logger.info("Attempting to open UI in browser...")
+            try:
+                ui_success = open_ui_in_browser(logger)
+                if ui_success:
+                    logger.info("UI successfully opened in browser")
+                else:
+                    logger.warning("Failed to open UI in browser, but server is running")
+                logger.info(f"UI server is running at http://localhost:{config.UI_PORT}. Press Ctrl+C to exit.")
+            except Exception as e:
+                logger.exception(f"Failed to open UI in browser: {e}")
+                logger.info(f"You can manually access the UI at http://localhost:{config.UI_PORT}")
         
             # Keep the server running so you can view results
             try:
@@ -248,3 +325,44 @@ def main() -> int:
             except:
                 pass
         return 1
+
+if __name__ == "__main__":
+    # First thing - verify basic output capability
+    try:
+        print("STARTUP: Stone Email Processor")
+        sys.stdout.write("STARTUP: Testing direct stdout write\n")
+        sys.stdout.flush()
+    except Exception as e:
+        # Try to write to a file if console output fails
+        with open("/tmp/stone_error.log", "w") as f:
+            f.write(f"Console output error: {str(e)}\n")
+
+    # Force stdout buffer to flush regularly
+    try:
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, line_buffering=True)
+    except Exception:
+        pass
+    
+    # Capture uncaught exceptions
+    try:
+        print("Calling main() function...")
+        exit_code = main()
+        print(f"Main function completed with exit code: {exit_code}")
+        sys.exit(exit_code)
+    except Exception as e:
+        error_msg = f"FATAL UNCAUGHT EXCEPTION: {str(e)}\n{traceback.format_exc()}"
+        
+        # Try multiple error reporting methods
+        try:
+            print(error_msg, file=sys.stderr)
+        except:
+            pass
+            
+        try:
+            with open("/tmp/stone_crash.log", "w") as f:
+                f.write(error_msg)
+        except:
+            pass
+            
+        sys.exit(1)
