@@ -3,3 +3,4 @@ mbox.mbox
 *.mbox.mbox
 mbox.mbox
 *.venv
+data/mbox.mbox
