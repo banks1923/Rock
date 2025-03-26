@@ -15,3 +15,5 @@ data/mbox.mbox
 # Ignore temp files
 *.swp
 *.tmp
+data/
+data/
