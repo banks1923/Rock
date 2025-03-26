@@ -4,3 +4,14 @@ mbox.mbox
 mbox.mbox
 *.venv
 data/mbox.mbox
+# Ignore mbox files
+*.mbox
+*.mbox.mbox
+# Ignore database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore temp files
+*.swp
+*.tmp
