@@ -969,3 +969,65 @@ AssertionError: View function mapping is overwriting an existing endpoint functi
 2025-03-24 21:18:19 - INFO - Opened UI in browser: http://127.0.0.1:8080
 2025-03-24 21:18:19 - INFO - UI successfully opened in browser
 2025-03-24 21:18:19 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-25 22:26:41 - INFO - Python version: 3.13.2 (v3.13.2:4f8bb3947cf, Feb  4 2025, 11:51:10) [Clang 15.0.0 (clang-1500.3.9.4)]
+2025-03-25 22:26:41 - INFO - Working directory: /Users/Shared/stonev2.03
+2025-03-25 22:26:41 - INFO - Database path: /Users/Shared/stonev2.03/emails.db
+2025-03-25 22:26:41 - INFO - Input directory: data
+2025-03-25 22:26:41 - INFO - Creating database: /Users/Shared/stonev2.03/emails.db
+2025-03-25 22:26:41 - INFO - Database schema created successfully
+2025-03-25 22:26:41 - INFO - Database ready at /Users/Shared/stonev2.03/emails.db
+2025-03-25 22:26:41 - INFO - UI server started at http://127.0.0.1:8080
+2025-03-25 22:26:41 - ERROR - Failed to start UI server: View function mapping is overwriting an existing endpoint function: search_database
+Traceback (most recent call last):
+  File "/Users/Shared/stonev2.03/main.py", line 164, in main
+    server, _ = start_ui_server(metrics, logger, str(db_path))
+                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/ui_manager.py", line 820, in start_ui_server
+    @app.route('/api/search', methods=['GET', 'POST'])
+     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/.venv/lib/python3.13/site-packages/flask/sansio/scaffold.py", line 362, in decorator
+    self.add_url_rule(rule, endpoint, f, **options)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/stonev2.03/.venv/lib/python3.13/site-packages/flask/sansio/scaffold.py", line 47, in wrapper_func
+    return f(self, *args, **kwargs)
+  File "/Users/Shared/stonev2.03/.venv/lib/python3.13/site-packages/flask/sansio/app.py", line 657, in add_url_rule
+    raise AssertionError(
+    ...<2 lines>...
+    )
+AssertionError: View function mapping is overwriting an existing endpoint function: search_database
+2025-03-25 22:26:41 - INFO - Confirmed write access to data directory: data
+2025-03-25 22:26:41 - INFO - Starting email processing...
+2025-03-25 22:26:41 - INFO - Looking for .mbox files in: data
+2025-03-25 22:26:41 - INFO - Directory contains 6 total files
+2025-03-25 22:26:41 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-25 22:26:41 - INFO - Looking for mbox files in: /Users/Shared/stonev2.03/data
+2025-03-25 22:26:41 - INFO - Found 1 .mbox files to process: ['mbox.mbox']
+2025-03-25 22:26:41 - INFO - Processing file: data/mbox.mbox
+2025-03-25 22:26:44 - INFO - Processing mbox file in batches: data/mbox.mbox
+2025-03-25 22:26:47 - INFO - Found 321 messages in data/mbox.mbox
+2025-03-25 22:26:52 - INFO - Processed 321/321 emails (100.0%)
+2025-03-25 22:26:52 - INFO - Inserting 321 email records into database: /Users/Shared/stonev2.03/emails.db
+2025-03-25 22:26:52 - INFO - Database insertion completed: 321 rows in 0.01s (31848.7 rows/sec)
+2025-03-25 22:26:52 - INFO - Inserted 321 emails from batch
+2025-03-25 22:26:52 - INFO - Closed mbox file: data/mbox.mbox
+2025-03-25 22:26:52 - INFO - Completed processing data/mbox.mbox: 321 of 321 emails processed
+2025-03-25 22:26:52 - INFO - Starting image processing...
+2025-03-25 22:26:52 - INFO - No image files found in data
+2025-03-25 22:26:52 - INFO - Starting PDF processing...
+2025-03-25 22:26:52 - INFO - Found 2 PDF files to process
+2025-03-25 22:26:52 - INFO - Successfully processed 2 PDF files
+2025-03-25 22:26:52 - INFO - ==================================================
+2025-03-25 22:26:52 - INFO - PROCESSING SUMMARY
+2025-03-25 22:26:52 - INFO - ==================================================
+2025-03-25 22:26:52 - INFO - Total time: 11.45 seconds
+2025-03-25 22:26:52 - INFO - Files processed: 1
+2025-03-25 22:26:52 - INFO - Emails processed: 321
+2025-03-25 22:26:52 - INFO - --------------------------------------------------
+2025-03-25 22:26:52 - INFO - For detailed statistics and visualization, visit the UI at: http://localhost:8080
+2025-03-25 22:26:52 - INFO - Press Ctrl+C to exit the server when done.
+2025-03-25 22:26:52 - INFO - Database statistics: {'tables': ['emails', 'email_threads'], 'total_emails': 314, 'total_threads': 191, 'db_size_kb': 1772}
+2025-03-25 22:26:52 - INFO - Attempting to open UI in browser...
+2025-03-25 22:26:52 - INFO - Opened UI in browser: http://127.0.0.1:8080
+2025-03-25 22:26:52 - INFO - UI successfully opened in browser
+2025-03-25 22:26:52 - INFO - UI server is running at http://localhost:8080. Press Ctrl+C to exit.
+2025-03-25 23:31:21 - INFO - Shutting down UI server...
